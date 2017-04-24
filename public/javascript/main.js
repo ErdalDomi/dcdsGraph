@@ -1,6 +1,7 @@
 $( document ).ready(function() {
     console.log( "ready!" );
     $('.ui.accordion').accordion();
+    $('.ui.accordion').accordion({exclusive: false});
     var nodes = new vis.DataSet([
         {id: 1, label: 'Node 1'},
         {id: 2, label: 'Node 2'},

@@ -69,10 +69,6 @@
   align-items: center;
 }
 
-ui.sidebar.inverted.vertical.menu {
-  background: #373737;
-}
-
 .ui.form input[type="text"]
 {
   color: #f2711c;
