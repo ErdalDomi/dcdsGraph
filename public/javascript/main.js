@@ -30,12 +30,21 @@ $( document ).ready(function() {
 
 });
 
-function submitForm(){
 
-  document.getElementById('databaseForm').submit();
-  //the page refreshes so we cant edit html yet
-  //thats why we need an ajax request to the server to make the db connection
-  //after we get the ok response from server
-  //then we signal to the user by adding a connection status
-  //or disabling the form in some way
+function myFunction(){
+  var username = document.getElementsByName('username')[0].value;
+  var password = document.getElementsByName('password')[0].value;
+  var dbname = document.getElementsByName('dbname')[0].value;
+
+  console.log("we have: " + username + " + " + password + " + " + dbname);
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function(){
+    if(this.readyState == 4 && this.status == 200){
+      alert(this.responseText);
+    }
+  }
+  xhttp.open("post", "/dbconnect", true);
+  xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  var object = {username: username};
+  xhttp.send('username='+username+'&password='+password+'&dbname='+dbname);
 }

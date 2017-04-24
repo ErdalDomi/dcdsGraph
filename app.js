@@ -14,9 +14,9 @@ var client;
 
 app.use(express.static(path.join(__dirname, 'public')))
 
-// app.get('/dbconnect', function(req, res){
-//   res.send('trying to connect to db')
-// })
+app.post('/test', function(req, res){
+  console.log(req.body.username + " " +req.body.password);
+})
 app.post("/dbconnect", function(request, response){
   console.log("got a dbconnect psot request");
   var username = request.body.username;
@@ -36,7 +36,7 @@ app.post("/dbconnect", function(request, response){
     }
   });
   console.log('Database connection established');
-  response.redirect('back');
+  response.send('hey.');
 });
 app.listen(8000,function(){
   console.log('Listening on port 8000')
