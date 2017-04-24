@@ -1,0 +1,76 @@
+#leftPanel {
+  border: 1px solid gray;
+  height: 98vh;
+  width: 20%;
+  float: left;
+}
+
+#rightPanel{
+  border: 1px solid gray;
+  height: 98vh;
+  width: 79%;
+  float: right;
+}
+
+#databaseContent {
+  background: #373737;
+}
+
+#silkInput{
+  background: #373737;
+  color: #f4f4f4;
+  border: 1px solid #373737;
+  border-bottom: 1px solid #f4f4f4;
+}
+
+#silkInput:focus{
+ border-color: #f4f4f4;
+}
+
+#silkLabel{
+  color: #f4f4f4;
+}
+
+#dbButton{
+  width: 100%;
+  color: #c0b283;
+  background: #373737;
+}
+
+#dbButton:hover, #dbButton:focus{
+  border-left: 1px solid #f4f4f4;
+  border-right: 1px solid #f4f4f4;
+}
+
+#goldTitles{
+  color: #C0B283;
+}
+.title{
+  background-color: #373737;
+  margin-bottom: 5px;
+}
+
+.content{
+  background-color: #373737;
+  margin-bottom: 5px;
+}
+
+.form{
+  width: 90%;
+  position: relative;
+  left: 5%;
+  text-align: center;
+}
+.field {
+  align-items: center;
+}
+
+ui.sidebar.inverted.vertical.menu {
+  background: #373737;
+}
+
+.ui.form input[type="text"]
+{
+  color: #f2711c;
+  background: darkslategrey;
+}

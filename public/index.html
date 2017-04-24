@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DCDS</title>
+    <link rel="stylesheet" href="css/styling.css">
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="semantic/dist/semantic.min.js"></script>
+    <script src="javascript/main.js"></script>
+  </head>
+  <body>
+    <div class="ui sidebar inverted vertical menu" style="background: #373737;">
+      <div class="ui inverted segment" style="background: #373737;">
+        <div class="ui inverted accordion">
+          <div id="goldTitles" class="title">
+            <i class="dropdown icon"></i>
+            DATABASE CONNECTION
+          </div>
+          <div class="content" id="databaseContent">
+            <form class="ui small form">
+              <div class="ui fluid input field">
+                <label id="silkLabel" >Username:&nbsp;&nbsp;&nbsp; </label>
+                <input id="silkInput" type="text" name="username" autocomplete="off">
+              </div>
+              <div class="ui fluid input field">
+                <label id="silkLabel">Password:&nbsp;&nbsp;&nbsp;&nbsp; </label>
+                <input id="silkInput" type="password" name="password">
+              </div>
+              <div class="ui fluid input field">
+                <label id="silkLabel">Database:&nbsp;&nbsp;&nbsp;&nbsp; </label>
+                <input id="silkInput" type="text" name="dbname"  autocomplete="off">
+              </div>
+              <button id="dbButton" class="ui button" type="submit">Connect</button>
+              <label>Connection status: <p id="connStatus" style="background: #4b2735; color:#f5f5f5;"> Disconnected</p></label>
+              <label>Connection status: <p style="background: #354b27; color:#f5f5f5;"> Connected</p></label>
+            </form>
+          </div>
+          <div class="title" id="goldTitles">
+            <i class="dropdown icon"></i>
+            NODE INFORMATION
+          </div>
+          <div class="content">
+            <p>There are many breeds of dogs. Each breed varies in size and temperament. Owners often select a breed of dog that they find to be compatible with their own lifestyle and desires from a companion.</p>
+          </div>
+          <div class="title" id="goldTitles">
+            <i class="dropdown icon"></i>
+            QUERY
+          </div>
+          <div class="content">
+            <p>Three common ways for a prospective owner to acquire a dog is from pet shops, private owners, or shelters.</p>
+            <p>A pet shop may be the most convenient way to buy a dog. Buying a dog from a private owner allows you to assess the pedigree and upbringing of your dog before choosing to take it home. Lastly, finding your dog from a shelter, helps give a good home to a dog who may not find one so readily.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pusher">
+      <!-- Site content !-->
+      <div class="ui top attached menu">
+        <button class="ui icon button" onclick="showSidePanel()">
+          <i class="settings icon"></i>
+        </button>
+        <label>Title</label>
+        <div class="right menu">
+          <div class="ui right aligned category search item">
+            <div class="ui transparent icon input">
+              <input class="prompt" type="text" placeholder="Search animals...">
+              <i class="search link icon"></i>
+            </div>
+            <div class="results"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ui bottom attached segment" style="height: 100%;">
+        <div id="mynetwork" style="height: 92vh;"></div>
+        <script src="javascript/vis.js"></script>
+      </div>
+
+    </div>
+  </body>
+</html>
