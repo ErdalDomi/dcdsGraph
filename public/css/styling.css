@@ -1,15 +1,19 @@
 #leftPanel {
   border: 1px solid gray;
-  height: 98vh;
+  height: 100vh;
   width: 20%;
   float: left;
 }
 
 #rightPanel{
   border: 1px solid gray;
-  height: 98vh;
-  width: 79%;
+  height: 100vh;
+  width: 80%;
   float: right;
+}
+
+#mynetwork{
+  height: 100vh;
 }
 
 #databaseContent {

@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>DCDS</title>
-    <link rel="stylesheet" href="css/styling.css">
-    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="semantic/dist/semantic.min.js"></script>
-    <script src="javascript/main.js"></script>
-  </head>
-  <body>
-    <div class="ui sidebar inverted vertical menu" style="background: #373737;">
+<head>
+  <meta charset="utf-8">
+  <title>DCDS</title>
+  <link rel="stylesheet" href="css/styling.css">
+  <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css">
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="semantic/dist/semantic.min.js"></script>
+  <script src="javascript/main.js"></script>
+</head>
+<body>
+  <div id="wrapper">
+    <div id="leftPanel" style="background: #373737;">
       <div class="ui inverted segment" style="background: #373737;">
         <div class="ui inverted accordion">
           <div id="goldTitles" class="title">
@@ -54,28 +55,13 @@
         </div>
       </div>
     </div>
-    <div class="pusher">
-      <!-- Site content !-->
-      <div class="ui top attached menu">
-        <button class="ui icon button" onclick="showSidePanel()">
-          <i class="settings icon"></i>
-        </button>
-        <label>Title</label>
-        <div class="right menu">
-          <div class="ui right aligned category search item">
-            <div class="ui transparent icon input">
-              <input class="prompt" type="text" placeholder="Search animals...">
-              <i class="search link icon"></i>
-            </div>
-            <div class="results"></div>
-          </div>
-        </div>
-      </div>
-      <div class="ui bottom attached segment" style="height: 100%;">
-        <div id="mynetwork" style="height: 92vh;"></div>
-        <script src="javascript/vis.js"></script>
-      </div>
-
+    <div class="ui bottom attached segment" style="height: 100%;" id="rightPanel">
+      <!-- tabs here -->
+      <div id="mynetwork"></div>
+      <script src="javascript/vis.js"></script>
     </div>
-  </body>
+
+  </div>
+
+</body>
 </html>
