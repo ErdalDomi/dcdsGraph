@@ -46,6 +46,21 @@
   border-right: 1px solid #f4f4f4;
 }
 
+#loadNodeButton{
+  width: 90%;
+  color: #c0b283;
+  background: #373737;
+  /*---center something in a div--*/
+  display: block;
+  margin: 0 auto;
+  /*------------------------------*/
+}
+
+#loadNodeButton:hover, #dbButton:focus{
+  border-left: 1px solid #f4f4f4;
+  border-right: 1px solid #f4f4f4;
+}
+
 #goldTitles{
   color: #C0B283;
 }
