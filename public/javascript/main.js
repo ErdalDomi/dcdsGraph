@@ -30,10 +30,12 @@ $( document ).ready(function() {
 
 });
 
+function submitForm(){
 
-
-function showSidePanel(){
-  $('.ui.sidebar')
-    .sidebar('toggle')
-  ;
+  document.getElementById('databaseForm').submit();
+  //the page refreshes so we cant edit html yet
+  //thats why we need an ajax request to the server to make the db connection
+  //after we get the ok response from server
+  //then we signal to the user by adding a connection status
+  //or disabling the form in some way
 }

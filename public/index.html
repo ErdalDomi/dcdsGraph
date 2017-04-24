@@ -19,7 +19,7 @@
             DATABASE CONNECTION
           </div>
           <div class="active content" id="databaseContent">
-            <form class="ui small form" action="/dbconnect" method="post">
+            <form class="ui small form" action="/dbconnect" method="post" id="databaseForm">
               <div class="ui fluid input field">
                 <label id="silkLabel" >Username:&nbsp;&nbsp;&nbsp; </label>
                 <input id="silkInput" type="text" name="username" autocomplete="off">
@@ -32,7 +32,7 @@
                 <label id="silkLabel">Database:&nbsp;&nbsp;&nbsp;&nbsp; </label>
                 <input id="silkInput" type="text" name="dbname"  autocomplete="off">
               </div>
-              <button id="dbButton" class="ui button" type="submit">Connect</button>
+              <button id="dbButton" class="ui button" onclick="submitForm()">Connect</button>
             </form>
           </div>
           <div class="title" id="goldTitles">
