@@ -20,7 +20,7 @@ function connectDB(){
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
-      alert(this.responseText); //this is where we change the connection status. do some jquery
+      //alert(this.responseText); //this is where we change the connection status. do some jquery
     }
   }
   xhttp.open("post", "/dbconnect", true);
@@ -32,7 +32,14 @@ function connectDB(){
 var nodes = [];
 var edges = [];
 var network;
-var options;
+var options = {
+  nodes: {
+    color: {
+      border: '#A2C5AC',
+      background: '#7F6A93'
+    }
+  }
+};
 
 function loadGraph(){
   console.time('loading network');
@@ -59,8 +66,23 @@ function loadGraph(){
       nodes: treatedNodes,
       edges: treatedEdges
     };
-    options = {};
+    options = {
+      nodes: {
+        font: {
+          color: '#e3b23c'
+        },
+        color: {
+          border: '#F0B67F',
+          background: '#FE5F55',
+          highlight: {
+            border: '#e3b23c',
+            background: '#423E37'
+          }
+        }
+      }
+    };
     network = new vis.Network(container, data, options);
+    network.setOptions(options);
   }, 100); // + - ?
 
 }
