@@ -48,6 +48,20 @@ app.listen(port,function(){
   console.log('Listening on port ' + port)
 })
 
+app.post("/queryNodes", function(req, res){
+  console.log("The query made it on the backend: "+ req.body.query);
+  var query = client.query(req.body.query);
+  var idArray = [];
+  query.on('row', function(row, result){
+    idArray.push(row.tso);
+  });
+
+  query.on('end', function(result){
+    res.send(idArray);
+  });
+});
+
+
 //This will load nodes from the connection table
 //and put them into the resopnse array as an object
 app.get("/loadNodes", function(request, response){
@@ -58,6 +72,7 @@ app.get("/loadNodes", function(request, response){
     curr = {id: row.id, label: row.name};
     responseArray.push(curr);
   });
+  //here fix change to query on 'end'
   setTimeout(function(){
     console.time('server loadNodes');
     response.send(responseArray);

@@ -137,3 +137,21 @@ in order to interact with nodes */
 //     document.getElementById('nodeName').innerHTML = (""+x[nr-1].label);
 //   });
 // })
+
+function findNodes(){
+  var query = document.getElementById("queryBox").value;
+  console.log(query);
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function(){
+    if(this.readyState == 4 && this.status == 200){
+      var ids = JSON.parse(this.responseText);
+      console.log("ids is: "+ids);
+      console.log("first " + ids[0]);
+      console.log("second " + ids[1]);
+      network.selectNodes(ids, true);
+    }
+  }
+  xhttp.open("post", "/queryNodes", true);
+  xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhttp.send('query='+query);
+}
