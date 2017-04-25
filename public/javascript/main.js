@@ -68,17 +68,26 @@ function loadGraph(){
     };
     options = {
       nodes: {
-        font: {
-          color: '#e3b23c'
-        },
+        size: 35,
         color: {
-          border: '#F0B67F',
-          background: '#FE5F55',
+          border: '#798071',
+          background: '#162521',
           highlight: {
-            border: '#e3b23c',
-            background: '#423E37'
+            border: '#2B7CE9',
+            background: '#D2E5FF'
+          },
+          hover: {
+            border: '#2B7CE9',
+            background: '#D2E5FF'
           }
-        }
+        },
+        font: {
+          color: '#D3D5D4',
+          size: 14, //px
+          strokeColor: '#fff',
+          align: 'center'
+        },
+        shape: 'circle'
       }
     };
     network = new vis.Network(container, data, options);
@@ -118,13 +127,13 @@ function loadNodes(){
 }
 /* In this part we get the network div and add an event listener to it
 in order to interact with nodes */
-var graphDiv = document.getElementById('mynetwork');
-graphDiv.addEventListener('click', function(event){
-  network.on("click", function (params) {
-    params.event = "[original event]";
-    var nr = params.nodes[0];
-    var x = JSON.parse(nodes);
-    console.log(x[nr-1].label);
-    document.getElementById('nodeName').innerHTML = (""+x[nr-1].label);
-  });
-})
+// var graphDiv = document.getElementById('mynetwork');
+// graphDiv.addEventListener('click', function(event){
+//   network.on("click", function (params) {
+//     params.event = "[original event]";
+//     var nr = params.nodes[0];
+//     var x = JSON.parse(nodes);
+//     console.log(x[nr-1].label);
+//     document.getElementById('nodeName').innerHTML = (""+x[nr-1].label);
+//   });
+// })

@@ -53,6 +53,24 @@ body{
  border-color: var(--fnt-col);
 }
 
+#queryBox{
+  background: var(--left-panel);
+  color: var(--fnt-col);
+  border: 1px solid var(--left-panel);
+  border-bottom: 1px solid var(--fnt-col);
+  width: 90%;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  padding: 3px;
+}
+
+#queryBox:focus{
+  outline: 0px none transparent;
+  border: 1px solid var(--fnt-col);
+  border-radius: 5px;
+}
+
 #silkLabel{
   color: var(--fnt-col);
 }
@@ -78,9 +96,17 @@ body{
   /*------------------------------*/
 }
 
-#loadNodeButton:hover, #dbButton:focus{
+#loadNodeButton:hover, #dbButton:focus, #findNodeButton:hover {
   border-left: 1px solid var(--fnt-col);
   border-right: 1px solid var(--fnt-col);
+}
+
+#findNodeButton{
+  width: 90%;
+  color: var(--titles);
+  background: var(--left-panel);
+  display: block;
+  margin: 0 auto;
 }
 
 #goldTitles{
