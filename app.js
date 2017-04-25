@@ -61,6 +61,40 @@ app.post("/queryNodes", function(req, res){
   });
 });
 
+app.post("/loadNextNodes", function(req,res){
+  var query = client.query('select distinct tso from edges where frosm = '+req.body.currentNodeID);
+  var responseArray = [];
+  query.on('row', function(row, result){
+    responseArray.push({id: row.tso, label: row.tso});
+  });
+  query.on('end', function(result){
+    res.send(responseArray);
+  });
+});
+
+app.post("/loadNextEdges", function(req,res){
+  var query = client.query("select * from edges where frosm ="+req.body.currentNodeID);
+  var responseArray = [];
+  query.on('row', function(row, result){
+    curr = {from: row.frosm, to: row.tso, arrows: 'to'};
+    responseArray.push(curr);
+  });
+  query.on('end', function(result){
+    res.send(responseArray);
+  });
+});
+
+app.get("/loadRoot", function(req,res){
+  var query = client.query('select * from connection where id = 1');
+  var rootNode;
+  query.on('row', function(row, result){
+    rootNode = {id: row.id, label: row.name};
+  });
+  query.on('end', function(result){
+    res.send(rootNode);
+  });
+});
+
 
 //This will load nodes from the connection table
 //and put them into the resopnse array as an object
@@ -73,11 +107,11 @@ app.get("/loadNodes", function(request, response){
     responseArray.push(curr);
   });
   //here fix change to query on 'end'
-  setTimeout(function(){
+  query.on('end', function(result){
     console.time('server loadNodes');
     response.send(responseArray);
     console.timeEnd('server loadNodes');
-  }, 50 );
+  });
 });
 
 app.get("/loadEdges", function(request, response){
@@ -88,9 +122,9 @@ app.get("/loadEdges", function(request, response){
     curr = {from: row.frosm, to: row.tso, arrows: 'to'};
     responseArray.push(curr);
   });
-  setTimeout(function(){
+  query.on('end', function(result){
     console.time('server loadEdges');
     response.send(responseArray);
     console.timeEnd('server loadEdges');
-  }, 50);
+  });
 });

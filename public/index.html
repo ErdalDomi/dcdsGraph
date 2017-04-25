@@ -8,6 +8,7 @@
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="semantic/dist/semantic.min.js"></script>
 
+
 </head>
 <body>
   <div id="wrapper">
@@ -40,7 +41,9 @@
             NODE VISUALIZATION
           </div>
           <div class="active content">
-            <button class="ui button" id="loadNodeButton" onclick="loadGraph();"> Load graph </button>
+            <button class="ui button" id="rootNodeButton" onclick="loadRoot();"> Load root node </button>
+            <button class="ui button" id="allNodesButton" onclick="loadGraph();"> Load full graph </button>
+            <button class="ui button" id="evolveButton" onclick="nextStep();">Evolve</button>
           </div>
           <div class="title" id="goldTitles">
             <i class="dropdown icon"></i>
@@ -55,7 +58,6 @@
 
     </div>
     <div class="ui bottom attached segment" id="rightPanel">
-      <!-- tabs here -->
       <div id="mynetwork"></div>
       <script src="javascript/vis.js"></script>
       <script src="javascript/main.js"></script>

@@ -86,17 +86,17 @@ body{
   border-right: 1px solid var(--fnt-col);
 }
 
-#loadNodeButton{
+#allNodesButton, #rootNodeButton, #evolveButton{
   width: 90%;
   color: var(--titles);
   background:var(--left-panel);
   /*---center something in a div--*/
-  display: block;
+  display: block !important;
   margin: 0 auto;
   /*------------------------------*/
 }
 
-#loadNodeButton:hover, #dbButton:focus, #findNodeButton:hover {
+#allNodesButton:hover, #rootNodeButton:hover, #evolveButton:hover, #dbButton:focus, #findNodeButton:hover {
   border-left: 1px solid var(--fnt-col);
   border-right: 1px solid var(--fnt-col);
 }
