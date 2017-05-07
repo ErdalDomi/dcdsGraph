@@ -21,9 +21,9 @@ create a connection to the db. Then we use the variable
 client to query the database.*/
 app.post("/dbconnect", function(request, response){
   console.log("got a dbconnect psot request");
-  var username = 'postgres'; //request.body.username;
-  var password = 'password'; //request.body.password;
-  var dbname = 'dcds'; //request.body.dbname;
+  var username = request.body.username;//'postgres'; //request.body.username;
+  var password = request.body.password;//'password'; //request.body.password;
+  var dbname = request.body.dbname;//'dcds'; //request.body.dbname;
   var connectionStatus = "yes"; //to keep track of the connection status
   client = new Client({
       user: username,

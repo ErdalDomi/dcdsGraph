@@ -224,7 +224,7 @@ function findNodes(){
       // }else{
       //   console.log('it doesnt exit');
       // }
-      // network.selectNodes(ids, true);
+      // network.selectNodes(ids, true);  //find a way to select nodes if response has a 'next' attribute
       $('#clickedNode').text("Selected node: " + ids);
 
       $('.ui.dropdown').dropdown('show');
