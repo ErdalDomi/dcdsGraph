@@ -23,7 +23,7 @@ app.post("/dbconnect", function(request, response){
   console.log("got a dbconnect psot request");
   var username = 'postgres'; //request.body.username;
   var password = 'password'; //request.body.password;
-  var dbname = 'travel'; //request.body.dbname;
+  var dbname = 'dcds'; //request.body.dbname;
   var connectionStatus = "yes"; //to keep track of the connection status
   client = new Client({
       user: username,
@@ -44,16 +44,29 @@ app.post("/dbconnect", function(request, response){
 
 //Start the app
 var port = 8000;
-app.listen(port,function(){
-  console.log('Listening on port ' + port)
-})
+var onServerStart = function() {
+  console.log("Listening on port " + port);
+}
+app.listen(port,onServerStart);
 
 app.post("/queryNodes", function(req, res){
-  console.log("The query made it on the backend: "+ req.body.query);
   var query = client.query(req.body.query);
   var idArray = [];
   query.on('row', function(row, result){
-    idArray.push(row.tso);
+    idArray.push(row.next);
+  });
+
+  query.on('end', function(result){
+    res.send(idArray);
+  });
+});
+
+app.post("/queryTotalStates", function(req, res){
+  console.log("The total states query made it on the backend: "+ req.body.query);
+  var query = client.query(req.body.query);
+  var idArray = [];
+  query.on('row', function(row, result){
+    idArray.push(row.state);
   });
 
   query.on('end', function(result){
@@ -62,10 +75,13 @@ app.post("/queryNodes", function(req, res){
 });
 
 app.post("/loadNextNodes", function(req,res){
-  var query = client.query('select distinct tso from edges where frosm = '+req.body.currentNodeID);
+
+  var query = client.query('select next from "TS" where curr = '+req.body.currentNodeID);
+
   var responseArray = [];
   query.on('row', function(row, result){
-    responseArray.push({id: row.tso, label: row.tso});
+    console.log("row next: " + row.next);
+    responseArray.push({id: row.next, label: row.next});
   });
   query.on('end', function(result){
     res.send(responseArray);
@@ -73,10 +89,14 @@ app.post("/loadNextNodes", function(req,res){
 });
 
 app.post("/loadNextEdges", function(req,res){
-  var query = client.query("select * from edges where frosm ="+req.body.currentNodeID);
+
+  var query = client.query('select * from "TS" where curr ='+req.body.currentNodeID);
+
   var responseArray = [];
   query.on('row', function(row, result){
-    curr = {from: row.frosm, to: row.tso, arrows: 'to'};
+
+    var currLabel = '('+row.action+','+row.binding+')';
+    curr = {from: row.curr, to: row.next, arrows: 'to', label: currLabel };
     responseArray.push(curr);
   });
   query.on('end', function(result){
@@ -85,10 +105,10 @@ app.post("/loadNextEdges", function(req,res){
 });
 
 app.get("/loadRoot", function(req,res){
-  var query = client.query('select * from connection where id = 1');
+  var query = client.query('select * from "TS" where curr = 1');
   var rootNode;
   query.on('row', function(row, result){
-    rootNode = {id: row.id, label: row.name};
+    rootNode = {curr: row.curr, label: ""+row.action+" "+row.binding};
   });
   query.on('end', function(result){
     res.send(rootNode);
@@ -100,30 +120,32 @@ app.get("/loadRoot", function(req,res){
 //and put them into the resopnse array as an object
 app.get("/loadNodes", function(request, response){
 
-  var query = client.query('select * from connection');
+  var query = client.query('select distinct curr from "TS"');
   var responseArray = [];
   query.on('row', function(row, result) {
-    curr = {id: row.id, label: row.name};
+    curr = {id: row.curr, label: row.curr};
     responseArray.push(curr);
   });
-  //here fix change to query on 'end'
   query.on('end', function(result){
     console.time('server loadNodes');
     response.send(responseArray);
+    console.log("load nodes response array: " + responseArray);
     console.timeEnd('server loadNodes');
   });
 });
 
 app.get("/loadEdges", function(request, response){
 
-  var query = client.query('select * from edges');
+  var query = client.query('select * from "TS"');
   var responseArray = [];
   query.on('row', function(row, result){
-    curr = {from: row.frosm, to: row.tso, arrows: 'to'};
+    var currLabel = '('+row.action+','+row.binding+')';
+    curr = {from: row.curr, to: row.next, arrows: 'to', label: currLabel };
     responseArray.push(curr);
   });
   query.on('end', function(result){
     console.time('server loadEdges');
+    console.log("load edges response array: " + responseArray);
     response.send(responseArray);
     console.timeEnd('server loadEdges');
   });

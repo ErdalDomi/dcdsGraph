@@ -3,10 +3,16 @@ $( document ).ready(function() {
     $('.ui.accordion').accordion();
     $('.ui.accordion').accordion({exclusive: false});
     $('.tabular.menu .item').tab();
+    $('.ui.dropdown').dropdown({
+      onShow: function(){
+        console.log("showing modal");
+        //$("#upIcon").remove();
+      },
+      action: 'nothing',
+      direction: 'upward'
+    }); //there is a direction: upward setting
+    $('.ui.basic.modal').modal('show');
 });
-
-
-
 
 /* --------------------------------------------------------------------
 This connects to the database given the inputs from
@@ -25,18 +31,34 @@ function connectDB(){
   xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
       //alert(this.responseText); //this is where we change the connection status. do some jquery
+      if(this.responseText == "yes"){
+        $('.ui.basic.modal').modal('hide');
+      }
+      //else do some nag or visual cue to enter stuff again
     }
   }
   xhttp.open("post", "/dbconnect", true);
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhttp.send('username='+username+'&password='+password+'&dbname='+dbname);
+
 }
 
 /* This function will load the initial graph on the browser. */
-var nodes, edges, network, treatedNodes, treatedEdges;
+var nodes, edges, network;
 var rootNodeSet, rootEdgeSet, rootNode, currentNodeID; //this last one will have to become an array currnodes
 
 var options = {
+  layout: {
+    improvedLayout: true,
+    hierarchical: {
+      enabled: true,
+      parentCentralization: false,
+      blockShifting: true,
+      edgeMinimization: true,
+      sortMethod: 'directed',
+      direction: 'LR'
+    }
+  },
   nodes: {
     size: 35,
     color: {
@@ -64,7 +86,7 @@ var options = {
 function nextStep(){
   loadNextNodes();
   loadNextEdges();
-  currentNodeID++;
+  currentNodeID++; //figure out how to change this correctly
 }
 //the next thing to do now is to turn the currentNodeID into an array of nodes, so we can do the
 //function allStep() which expands many nodes at once.
@@ -80,6 +102,7 @@ function loadNextNodes(){
   }
   xhttp.open("post", "/loadNextNodes", true);
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  console.log("currenteNodeID "+ currentNodeID);
   xhttp.send('currentNodeID='+currentNodeID);
 }
 //also keep in mind node duplicates and cycle edges and stuff
@@ -102,51 +125,43 @@ function loadRoot(){
     if(this.readyState == 4 && this.status == 200){
       rootNode = JSON.parse(this.responseText);
       var container = document.getElementById('mynetwork');
-      rootNodeSet = new vis.DataSet([{id: rootNode.id, label: rootNode.id}]);
+      rootNodeSet = new vis.DataSet([{id: rootNode.curr, label: rootNode.curr}]);
       rootEdgeSet = new vis.DataSet();
       var data = {
         nodes: rootNodeSet,
         edges: rootEdgeSet
       };
       network = new vis.Network(container, data, options);
-      currentNodeID = rootNode.id;
+      network.on('click', function(params){
+         $('#clickedNode').text("Selected node: " + params.nodes);
+      });
+      currentNodeID = rootNode.curr;
     }
   }
   xhttp.open("GET", "/loadRoot", true);
   xhttp.send();
-
+  getTotalStates();
 }
 
 function loadGraph(){
-  console.time('loading network');
+  console.time('rendering network');
   loadNodes();
   loadEdges();
-  console.timeEnd('loading network');
+
   //we might need threads here to solve the concurrency issue. i might have to block
   // whatever is in setTimeout until edges thread is loaded.
   setTimeout(function(){
-    //We need to "treat" the nodes so we convert them to a format vis.js can understand
-    treatedNodes = [];
-    JSON.parse(nodes).forEach(function(currentNode){
-      var curr = {id: currentNode.id, label: currentNode.id};
-      treatedNodes.push(curr);
-    });
-    console.log(treatedNodes);
-    treatedEdges = [];
-    JSON.parse(edges).forEach(function(currentEdge){
-      var curr = {from: currentEdge.from, to: currentEdge.to, arrows: currentEdge.arrows};
-      treatedEdges.push(curr);
-    });
-    console.log(treatedEdges);
 
-    nodesDataSet = new vis.DataSet(treatedNodes);
-    edgesDataSet = new vis.DataSet(treatedEdges);
+    nodesDataSet = new vis.DataSet(JSON.parse(nodes));
+    edgesDataSet = new vis.DataSet(JSON.parse(edges));
     var container = document.getElementById('mynetwork');
     var data = {
       nodes: nodesDataSet,
       edges: edgesDataSet
     };
+
     network = new vis.Network(container, data, options);
+    console.timeEnd('rendering network');
 
   }, 50); // + - ? timeout
 
@@ -205,6 +220,21 @@ function findNodes(){
     }
   }
   xhttp.open("post", "/queryNodes", true);
+  xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhttp.send('query='+query);
+}
+
+function getTotalStates(){
+  var query = 'select * from "current_state";';
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function(){
+    if(this.readyState == 4 && this.status == 200){
+      console.log("this is the response text from total states: " + this.responseText);
+      var states = JSON.parse(this.responseText);
+      $('#totalStates').text("Total number of states: "+ states);
+    }
+  }
+  xhttp.open("post", "/queryTotalStates", true);
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhttp.send('query='+query);
 }

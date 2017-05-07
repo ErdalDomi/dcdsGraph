@@ -26,26 +26,25 @@ body{
 
 #rightPanel{
   background-color: var(--graph-bg);
-  height: 100vh;
   width: 80%;
   float: right;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 .ui.attached.segment {
   border: 0px;
 }
 
 #mynetwork{
-  height: 100vh;
-}
-
-#databaseContent {
-  background: var(--left-panel);
+flex: 1 1 auto;
+height: 93vh;
 }
 
 #silkInput{
-  background: var(--left-panel);
+  background: inherit;
   color: var(--fnt-col);
-  border: 1px solid var(--left-panel);
+  /*border: 1px solid var(--left-panel);*/
   border-bottom: 1px solid var(--fnt-col);
 }
 
@@ -53,38 +52,54 @@ body{
  border-color: var(--fnt-col);
 }
 
+#queryDiv {
+  display: inline-flex;
+  height: 5vh;
+  position: fixed;
+  bottom: 0;
+  width: 80%;
+
+}
 #queryBox{
-  background: var(--left-panel);
+  /*background: var(--left-panel);
   color: var(--fnt-col);
   border: 1px solid var(--left-panel);
-  border-bottom: 1px solid var(--fnt-col);
-  width: 90%;
-  display: block;
-  margin: 0 auto;
-  margin-bottom: 10px;
+  border-bottom: 1px solid var(--fnt-col);*/
+  resize: none;
+  overflow: hidden;
   padding: 3px;
+  width: 90%;
 }
-
+/*
 #queryBox:focus{
   outline: 0px none transparent;
   border: 1px solid var(--fnt-col);
   border-radius: 5px;
+}*/
+
+#findNodeButton{
+  color: var(--titles);
+  background: var(--left-panel);
+  width: 10%;
 }
 
+
 #silkLabel{
-  color: var(--fnt-col);
+  color: white;
 }
 
 #dbButton{
-  width: 100%;
-  color: var(--titles);
-  background:var(--left-panel);
+  display: block;
+  margin: 0 auto;
+  color: white;
+  background: inherit;
+  margin-left: 42%;
 }
 
-#dbButton:hover, #dbButton:focus{
+/*#dbButton:hover, #dbButton:focus{
   border-left: 1px solid var(--fnt-col);
   border-right: 1px solid var(--fnt-col);
-}
+}*/
 
 #allNodesButton, #rootNodeButton, #evolveButton{
   width: 90%;
@@ -96,18 +111,12 @@ body{
   /*------------------------------*/
 }
 
-#allNodesButton:hover, #rootNodeButton:hover, #evolveButton:hover, #dbButton:focus, #findNodeButton:hover {
+#allNodesButton:hover, #rootNodeButton:hover, #evolveButton:hover {
   border-left: 1px solid var(--fnt-col);
   border-right: 1px solid var(--fnt-col);
 }
 
-#findNodeButton{
-  width: 90%;
-  color: var(--titles);
-  background: var(--left-panel);
-  display: block;
-  margin: 0 auto;
-}
+
 
 #goldTitles{
   color: var(--titles);
@@ -122,11 +131,16 @@ body{
   margin-bottom: 5px;
 }
 
-.form{
-  width: 90%;
-  position: relative;
-  left: 5%;
-  text-align: center;
+#databaseForm {
+  display: block;
+  margin: 0 auto;
+  padding-right: 12%;
+}
+
+#loginModal {
+  top: 40%;
+  padding-left: 200px;
+  padding-right: 200px;
 }
 .field {
   align-items: center;
