@@ -50,14 +50,27 @@ var onServerStart = function() {
 app.listen(port,onServerStart);
 
 app.post("/queryNodes", function(req, res){
-  var query = client.query(req.body.query);
-  var idArray = [];
+  var columnNames = new Array();
+  var query = client.query(req.body.query, function(err, result){
+    var firstRow = result.rows[0];
+    for(var columnName in firstRow) {
+      columnNames.push(columnName);
+    }
+  });
+  var responseArray = [];
+  var currentRow = [];
+  responseArray.push(columnNames);
   query.on('row', function(row, result){
-    idArray.push(row.next);
+    for(var elements in row){
+      currentRow.push(row[elements]);
+    }
+    responseArray.push(currentRow);
+    currentRow = [];
   });
 
   query.on('end', function(result){
-    res.send(idArray);
+    console.log('sending back ' + responseArray + ' to client');
+    res.send(responseArray);
   });
 });
 

@@ -10,7 +10,8 @@ $( document ).ready(function() {
       },
       action: 'nothing',
       direction: 'upward'
-    }); //there is a direction: upward setting
+    });
+
     $('.ui.basic.modal').modal('show');
 });
 
@@ -215,14 +216,56 @@ function findNodes(){
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
+      console.log("the data we got back is: " + this.responseText);
       var ids = JSON.parse(this.responseText);
-      network.selectNodes(ids, true);
+      GenerateTable(ids);
+      // if(this.responseText[0].next){
+      //   console.log('it exists');
+      // }else{
+      //   console.log('it doesnt exit');
+      // }
+      // network.selectNodes(ids, true);
+      $('#clickedNode').text("Selected node: " + ids);
+
+      $('.ui.dropdown').dropdown('show');
     }
   }
   xhttp.open("post", "/queryNodes", true);
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhttp.send('query='+query);
 }
+
+
+function GenerateTable(data) {
+
+  console.log(data);
+
+  $('#queryTable tr').remove(); //reset
+  var table = document.getElementById("queryTable");
+  table.border = "1";
+
+  //Get the count of columns.
+  var columnCount = data[0].length;
+
+  //Add the header row.
+  var row = table.insertRow(-1);
+  for (var i = 0; i < columnCount; i++) {
+    var headerCell = document.createElement("TH");
+    headerCell.innerHTML = data[0][i];
+    row.appendChild(headerCell);
+  }
+
+  //Add the data rows.
+  for (var i = 1; i < data.length; i++) {
+    row = table.insertRow(-1);
+    for (var j = 0; j < columnCount; j++) {
+      var cell = row.insertCell(-1);
+      cell.innerHTML = data[i][j];
+    }
+  }
+
+}
+
 
 function getTotalStates(){
   var query = 'select * from "current_state";';
