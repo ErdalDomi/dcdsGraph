@@ -13,16 +13,15 @@
 <body>
   <div id="wrapper">
 
-
     <div class="ui basic modal" id="loginModal">
-      <div class="ui icon header">
+      <div class="ui icon header" style="padding-right: 9%;">
         <i class="database icon"></i>
         Database login
       </div>
       <div class="content">
         <form class="ui form" id="databaseForm" onsubmit="event.preventDefault(); connectDB();">
           <div class="ui fluid input field">
-            <label id="silkLabel">Username:&nbsp;&nbsp;&nbsp; </label>
+            <label id="silkLabel">Database user:&nbsp;&nbsp;&nbsp; </label>
             <input id="silkInput" type="text" name="username" autocomplete="off">
           </div>
           <div class="ui fluid input field">
@@ -30,7 +29,7 @@
             <input id="silkInput" type="password" name="password">
           </div>
           <div class="ui fluid input field">
-            <label id="silkLabel">Database:&nbsp;&nbsp;&nbsp;&nbsp; </label>
+            <label id="silkLabel">Database name:&nbsp;&nbsp;&nbsp;&nbsp; </label>
             <input id="silkInput" type="text" name="dbname"  autocomplete="off">
           </div>
           <button id="dbButton" class="ui inverted basic green button" onclick="">Connect</button>
@@ -58,8 +57,8 @@
             TRANSITION SYSTEM
           </div>
           <div class="active content">
-            <p id="clickedNode">Selected node: </p>
-            <p id="totalStates">Total number of states: </p>
+            <h4 class="info" style="">Selected node: <p id="clickedNode">-</p></h4>
+            <h4 class="info">Total number of states: <p id="totalStates">-</p></h4>
           </div>
         </div>
       </div>
@@ -69,11 +68,13 @@
 
 
     <div class="ui bottom attached segment" id="rightPanel">
+
       <div id="mynetwork"></div>
+
       <div class="ui icon bottom left dropdown">
         <i class="toggle up icon"></i>
         <div class="menu" style="min-width: none;">  <!-- style="width: 20%;" -->
-          <div class="item" style="width: 80%;"> <!-- style="height: 300px;" -->
+          <div class="item" id="queryResult" style=""> <!-- style="height: 300px;" -->
             <table id="queryTable">
 
             </table>

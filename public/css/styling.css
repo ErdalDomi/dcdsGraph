@@ -41,6 +41,8 @@ flex: 1 1 auto;
 height: 93vh;
 }
 
+
+
 #silkInput{
   background: inherit;
   color: var(--fnt-col);
@@ -50,6 +52,15 @@ height: 93vh;
 
 #silkInput:focus{
  border-color: var(--fnt-col);
+}
+
+#queryResult{
+  width: 80%;
+  cursor: auto;
+}
+
+#queryResult:hover{
+  background: none;
 }
 
 #queryDiv {
@@ -86,6 +97,7 @@ height: 93vh;
 
 #silkLabel{
   color: white;
+  width: 26%;
 }
 
 #dbButton{
@@ -93,7 +105,9 @@ height: 93vh;
   margin: 0 auto;
   color: white;
   background: inherit;
-  margin-left: 42%;
+  margin-top: 30px;
+  width: 35%;
+  margin-left: 150px;
 }
 
 /*#dbButton:hover, #dbButton:focus{

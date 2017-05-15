@@ -2,6 +2,8 @@ var express = require('express')
 var app = express()
 var path = require('path')
 var Client = require('pg').Client;
+var mysql = require('mysql');
+var psql = require('pg');
 var connection = require('pg').Connection;
 var bodyParser = require('body-parser')
 
@@ -21,9 +23,9 @@ create a connection to the db. Then we use the variable
 client to query the database.*/
 app.post("/dbconnect", function(request, response){
   console.log("got a dbconnect psot request");
-  var username = request.body.username;//'postgres'; //request.body.username;
-  var password = request.body.password;//'password'; //request.body.password;
-  var dbname = request.body.dbname;//'dcds'; //request.body.dbname;
+  var username = 'postgres'; //request.body.username;
+  var password = 'password'; //request.body.password;
+  var dbname = 'dcds'; //request.body.dbname;
   var connectionStatus = "yes"; //to keep track of the connection status
   client = new Client({
       user: username,
@@ -51,6 +53,7 @@ app.listen(port,onServerStart);
 
 app.post("/queryNodes", function(req, res){
   var columnNames = new Array();
+  console.log("got " + req.body.query);
   var query = client.query(req.body.query, function(err, result){
     var firstRow = result.rows[0];
     for(var columnName in firstRow) {

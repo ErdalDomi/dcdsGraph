@@ -1869,7 +1869,7 @@ return /******/ (function(modules) { // webpackBootstrap
   $export.B = 16;  // bind
   $export.W = 32;  // wrap
   $export.U = 64;  // safe
-  $export.R = 128; // real proto method for `library` 
+  $export.R = 128; // real proto method for `library`
   module.exports = $export;
 
 /***/ },
@@ -2995,7 +2995,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 79 */
 /***/ function(module, exports) {
 
-  
+
 
 /***/ },
 /* 80 */
@@ -12015,7 +12015,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 99 */
 /***/ function(module, exports) {
 
-  
+
   /**
    * Expose `Emitter`.
    */
@@ -13399,7 +13399,7 @@ return /******/ (function(modules) { // webpackBootstrap
   /**
    * Field names in the options hash which are of relevance to the user.
    *
-   * Same as OPTIONKEYS, but internally these fields are stored with 
+   * Same as OPTIONKEYS, but internally these fields are stored with
    * prefix 'default' in the name.
    */
   var PREFIXEDOPTIONKEYS = ['xBarWidth', 'yBarWidth', 'valueMin', 'valueMax', 'xMin', 'xMax', 'xStep', 'yMin', 'yMax', 'yStep', 'zMin', 'zMax', 'zStep'];
@@ -13448,11 +13448,11 @@ return /******/ (function(modules) { // webpackBootstrap
    * Forcibly copy fields from src to dst in a controlled manner.
    *
    * A given field in dst will always be overwitten. If this field
-   * is undefined or not present in src, the field in dst will 
+   * is undefined or not present in src, the field in dst will
    * be explicitly set to undefined.
-   * 
+   *
    * The intention here is to be able to reset all option fields.
-   * 
+   *
    * Only the fields mentioned in array 'fields' will be handled.
    *
    * @param fields array with names of fields to copy
@@ -13496,8 +13496,8 @@ return /******/ (function(modules) { // webpackBootstrap
   /**
    * Initialize dst with the values in src.
    *
-   * src is the hash with the default values. 
-   * A reference DEFAULTS to this hash is stored locally for 
+   * src is the hash with the default values.
+   * A reference DEFAULTS to this hash is stored locally for
    * further handling.
    *
    * For now, dst is assumed to be a Graph3d instance.
@@ -20361,7 +20361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
   /**
    * used in Core to convert the options into a volatile variable
-   * 
+   *
    * @param {function} moment
    * @param {Object} body
    * @param {Array | Object} hiddenDates
@@ -21125,7 +21125,7 @@ return /******/ (function(modules) { // webpackBootstrap
       if (event.stopPropagation) {
         event.stopPropagation();
       }
-      // return when dropping non-vis items 
+      // return when dropping non-vis items
       try {
         var itemData = JSON.parse(event.dataTransfer.getData("text"));
         if (!itemData.content) return;
@@ -22390,7 +22390,7 @@ return /******/ (function(modules) { // webpackBootstrap
     this.body.dom.centerContainer.addEventListener('mouseover', this._onMouseOver.bind(this));
     this.body.dom.centerContainer.addEventListener('mouseout', this._onMouseOut.bind(this));
     this.body.dom.centerContainer.addEventListener('mousemove', this._onMouseMove.bind(this));
-    // right-click on timeline 
+    // right-click on timeline
     this.body.dom.centerContainer.addEventListener('contextmenu', this._onDragEnd.bind(this));
 
     this.body.dom.centerContainer.addEventListener('mousewheel', this._onMouseWheel.bind(this));
@@ -23056,7 +23056,7 @@ return /******/ (function(modules) { // webpackBootstrap
       var selected;
 
       if (item) {
-        // update item   	
+        // update item
         if (!constructor || !(item instanceof constructor)) {
           // item type has changed, delete the item and recreate it
           selected = item.selected; // preserve selection of this item
@@ -23860,7 +23860,7 @@ return /******/ (function(modules) { // webpackBootstrap
                 orgOffset = 1;
                 continue;
               }
-              // found a group (apart from dragged group) that has the wrong position -> switch with the 
+              // found a group (apart from dragged group) that has the wrong position -> switch with the
               // group at the position where other one should be, fix index arrays and continue
               else {
                   var slippedPosition = newOrder.indexOf(origOrder[curPos + orgOffset]);
@@ -23919,7 +23919,7 @@ return /******/ (function(modules) { // webpackBootstrap
                 break;
               }
 
-              // found a group that has the wrong position -> switch with the 
+              // found a group that has the wrong position -> switch with the
               // group at the position where other one should be, fix index arrays and continue
               var slippedPosition = newOrder.indexOf(origOrder[curPos]);
               var switchGroup = dataset.get(newOrder[curPos]);
@@ -24117,7 +24117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
       if (event.type == 'drop') {
         var itemData = JSON.parse(event.dataTransfer.getData("text"));
-        newItemData.content = itemData.content; // content is required 
+        newItemData.content = itemData.content; // content is required
         newItemData.type = itemData.type || 'box';
         newItemData[this.itemsData._fieldId] = itemData.id || util.randomUUID();
 
@@ -26787,7 +26787,7 @@ return /******/ (function(modules) { // webpackBootstrap
       var tooltipOffset = 50; // TODO: should be tooltip height (depends on template)
       var scrollTop = this.parent.itemSet.body.domProps.scrollTop;
 
-      // TODO: this.top for orientation:true is actually the items distance from the bottom... 
+      // TODO: this.top for orientation:true is actually the items distance from the bottom...
       // (should be this.bottom)
       var itemDistanceFromTop;
       if (this.options.orientation.item == 'top') {
@@ -33499,7 +33499,7 @@ return /******/ (function(modules) { // webpackBootstrap
       }
 
       /**
-       * @param {string} url                      The Url to cache the image as 
+       * @param {string} url                      The Url to cache the image as
         * @return {Image} imageToLoadBrokenUrlOn  The image object
        */
 
@@ -33566,14 +33566,14 @@ return /******/ (function(modules) { // webpackBootstrap
           value: function load(url, brokenUrl, id) {
               var _this2 = this;
 
-              //Try and get the image from the cache, if successful then return the cached image   
+              //Try and get the image from the cache, if successful then return the cached image
               var cachedImage = this.images[url];
               if (cachedImage) return cachedImage;
 
               //Create a new image
               var img = new Image();
 
-              //Subscribe to the event that is raised if the image loads successfully 
+              //Subscribe to the event that is raised if the image loads successfully
               img.onload = function () {
                   //Add the image to the cache and then request a redraw
                   _this2._addImageToCache(url, img);

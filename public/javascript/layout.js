@@ -1,20 +1,49 @@
 $( document ).ready(function() {
-    console.log( "ready!" );
-    $('.ui.accordion').accordion();
-    $('.ui.accordion').accordion({exclusive: false});
-    $('.tabular.menu .item').tab();
-    $('.ui.dropdown').dropdown({
-      onShow: function(){
-        console.log("showing modal");
-        //$("#upIcon").remove();
-      },
-      action: 'nothing',
-      direction: 'upward'
-    });
+  console.log("DOM loaded.");
 
-    $('.ui.basic.modal').modal('show');
+  $('.tabular.menu .item').tab();
+  console.log("Tabs activated.");
+
+  $('.ui.basic.modal').modal('show');
+  console.log("Modal activated.");
+
+  $('.ui.accordion').accordion({exclusive: false});
+  console.log("Accordion activated.")
+
+  $('#psql').click(function(){
+    $('#psql').css("border-color", "#BF9B30");
+
+    $('#psql').children('img').css("-webkit-filter","opacity(.4) drop-shadow(0 0 0 #BF9B30)");
+    $('#psql').children('img').css("filter"," opacity(0.4) drop-shadow(0 0 0 #BF9B30)");
+
+    $('#mysql').children('img').css("-webkit-filter","none");
+    $('#mysql').children('img').css("filter"," none");
+
+    $('#mysql').css("border-color", "transparent");
+    selectedDatabase = "psql";
+  });
+
+  $('#mysql').click(function(){
+    $('#mysql').css("border-color", "#BF9B30");
+
+    $('#mysql').children('img').css("-webkit-filter","opacity(.4) drop-shadow(0 0 0 #BF9B30)");
+    $('#mysql').children('img').css("filter"," opacity(0.4) drop-shadow(0 0 0 #BF9B30)");
+
+    $('#psql').children('img').css("-webkit-filter","none");
+    $('#psql').children('img').css("filter"," none");
+
+    $('#psql').css("border-color", "transparent");
+    selectedDatabase = "mysql";
+  });
+
+  $('#queryButton').popup();
+  
+  $('#queryButton').popup({
+    on    : 'click'
+  });
+
+
 });
-
 
 
 /* --------------------------------------------------------------------
@@ -24,18 +53,19 @@ The line xhttp.send() sends the information to the server as a parameter.
 I don't know the security implications of this and find a more accurate
 way to send some input from a form securely with ajax and ExpressJS.
 ----------------------------------------------------------------------*/
+var selectedDatabase;
 function connectDB(){
   var username = document.getElementsByName('username')[0].value;
   var password = document.getElementsByName('password')[0].value;
   var dbname = document.getElementsByName('dbname')[0].value;
-
-  console.log("we have: " + username + " + " + password + " + " + dbname);
+  console.log("Selected database on form send: " + selectedDatabase);
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
       //alert(this.responseText); //this is where we change the connection status. do some jquery
       if(this.responseText == "yes"){
         $('.ui.basic.modal').modal('hide');
+        console.log("Connected to " + dbname + " as " + username + ".");
       }
       //else do some nag or visual cue to enter stuff again
     }
@@ -43,8 +73,9 @@ function connectDB(){
   xhttp.open("post", "/dbconnect", true);
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhttp.send('username='+username+'&password='+password+'&dbname='+dbname);
-
 }
+
+
 
 /* This function will load the initial graph on the browser. */
 var nodes, edges, network;
@@ -86,11 +117,12 @@ var options = {
   }
 };
 
-function nextStep(){
+function frontier(){
   loadNextNodes();
   loadNextEdges();
   currentNodeID++; //figure out how to change this correctly
 }
+
 //the next thing to do now is to turn the currentNodeID into an array of nodes, so we can do the
 //function allStep() which expands many nodes at once.
 //another thing to keep in mind is to expandSelectedNode() by using some vis.js functions
@@ -98,14 +130,13 @@ function loadNextNodes(){
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
-      console.log("loadnextnodes server response: " + this.responseText);
-      console.log("loadnextnodes this.responseText typeof: " + typeof(JSON.parse(this.responseText)));
+      console.log("Server passed these nodes: " + this.responseText);
       rootNodeSet.add(JSON.parse(this.responseText));
     }
   }
   xhttp.open("post", "/loadNextNodes", true);
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  console.log("currenteNodeID "+ currentNodeID);
+  console.log("Node ID trying to expand: "+ currentNodeID);
   xhttp.send('currentNodeID='+currentNodeID);
 }
 //also keep in mind node duplicates and cycle edges and stuff
@@ -113,7 +144,7 @@ function loadNextEdges(){
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
-      console.log("loadnextedges server response: " + this.responseText);
+      console.log("Server passed these edges: " + this.responseText);
       rootEdgeSet.add(JSON.parse(this.responseText));
     }
   }
@@ -121,6 +152,7 @@ function loadNextEdges(){
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhttp.send('currentNodeID='+currentNodeID);
 }
+
 
 function loadRoot(){
   var xhttp = new XMLHttpRequest();
@@ -136,7 +168,61 @@ function loadRoot(){
       };
       network = new vis.Network(container, data, options);
       network.on('click', function(params){
-         $('#clickedNode').text("Selected node: " + params.nodes);
+        $('#menu').hide();
+
+        $('#clickedNode').text("Selected node "+ params.nodes);
+      });
+      network.on("oncontext", function (params) {
+        console.log("clicked");
+        $("#mynetwork").contextmenu(function(){
+          return false;
+        });
+
+        var menu = $('#menu');
+
+         //hide menu if already shown
+	       menu.hide();
+	       console.log(params.pointer.DOM);
+	       //get x and y values of the click event
+	       var pageX = params.pointer.DOM.x;
+	       var pageY = params.pointer.DOM.y;
+
+
+         //position menu div near mouse cliked area
+		     menu.css({top: pageY , left: pageX});
+         var mwidth = menu.width();
+	       var mheight = menu.height();
+	       var screenWidth = $(window).width();
+	       var screenHeight = $(window).height();
+
+	       //if window is scrolled
+	       var scrTop = $(window).scrollTop();
+
+	       //if the menu is close to right edge of the window
+	       if(pageX+mwidth > screenWidth){
+	       	menu.css({left:pageX-mwidth});
+	       }
+
+	       //if the menu is close to bottom edge of the window
+	       if(pageY+mheight > screenHeight+scrTop){
+	       	menu.css({top:pageY-mheight});
+	       }
+
+	       theNode = network.getNodeAt(params.pointer.DOM);
+         console.log("theNode: " + theNode);
+         //use this ^ to get node information
+         $('#firstMenuItem').text("Node: "+theNode);
+         $('#clickedNode').text("Selected node: "+theNode);
+         menu.show();
+         if(!(network.getNodeAt(params.pointer.DOM))){
+           console.log("No node selected...");
+           //change this to reflect in the context menu
+           $('#firstMenuItem').text("Node: x");
+           //refactor all thsi network.getnode
+         }
+
+        params.event = "[original event]"; //?
+        network.selectNodes([theNode]);
       });
       currentNodeID = rootNode.curr;
     }
@@ -147,7 +233,7 @@ function loadRoot(){
 }
 
 function loadGraph(){
-  console.time('rendering network');
+  console.time('Rendering network...');
   loadNodes();
   loadEdges();
 
@@ -164,7 +250,7 @@ function loadGraph(){
     };
 
     network = new vis.Network(container, data, options);
-    console.timeEnd('rendering network');
+    console.timeEnd('Rendering network...');
 
   }, 50); // + - ? timeout
 
@@ -174,12 +260,12 @@ function loadGraph(){
 The information is saved on the edges variable. The format of the
 information is an array of objects that hold necessary edge information.*/
 function loadEdges(){
-  console.time('loadEdges');
+  console.time('Loading edges from server...');
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
       edges = this.responseText;
-      console.timeEnd('loadEdges');
+      console.timeEnd('Loading edges from server...');
     }
   }
   xhttp.open("GET", "/loadEdges", true);
@@ -188,32 +274,34 @@ function loadEdges(){
 
 /*The same principle applies here too*/
 function loadNodes(){
-  console.time('loadNodes');
+  console.time('Loading nodes from server...');
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function(){
     if(this.readyState == 4 && this.status == 200){
       nodes = this.responseText;
-      console.timeEnd('loadNodes');
+      console.timeEnd('Loading nodes from server...');
     }
   }
   xhttp.open("GET", "/loadNodes", true);
   xhttp.send();
 }
-/* In this part we get the network div and add an event listener to it
-in order to interact with nodes */
-// var graphDiv = document.getElementById('mynetwork');
-// graphDiv.addEventListener('click', function(event){
-//   network.on("click", function (params) {
-//     params.event = "[original event]";
-//     var nr = params.nodes[0];
-//     var x = JSON.parse(nodes);
-//     console.log(x[nr-1].label);
-//     document.getElementById('nodeName').innerHTML = (""+x[nr-1].label);
-//   });
-// })
+
+function getTotalStates(){
+  var query = 'select * from "current_state";';
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function(){
+    if(this.readyState == 4 && this.status == 200){
+      console.log("Total states number: " + this.responseText);
+      var states = JSON.parse(this.responseText);
+      $('#totalStates').text("Total states " + states);
+    }
+  }
+  xhttp.open("post", "/queryTotalStates", true);
+  xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhttp.send('query='+query);
+}
 
 function findNodes(){
-
   var query = document.getElementById("queryBox").value;
   console.log(query);
   var xhttp = new XMLHttpRequest();
@@ -227,7 +315,7 @@ function findNodes(){
       // }else{
       //   console.log('it doesnt exit');
       // }
-      // network.selectNodes(ids, true);  //find a way to select nodes if response has a 'next' attribute
+      //network.selectNodes(ids, true);  //find a way to select nodes if response has a 'next' attribute
       $('#clickedNode').text(""+ids);
 
       $('.ui.dropdown').dropdown('show');
@@ -237,7 +325,6 @@ function findNodes(){
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhttp.send('query='+query);
 }
-
 
 function GenerateTable(data) {
 
@@ -267,20 +354,4 @@ function GenerateTable(data) {
     }
   }
 
-}
-
-
-function getTotalStates(){
-  var query = 'select * from "current_state";';
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function(){
-    if(this.readyState == 4 && this.status == 200){
-      console.log("this is the response text from total states: " + this.responseText);
-      var states = JSON.parse(this.responseText);
-      $('#totalStates').text(states);
-    }
-  }
-  xhttp.open("post", "/queryTotalStates", true);
-  xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  xhttp.send('query='+query);
 }

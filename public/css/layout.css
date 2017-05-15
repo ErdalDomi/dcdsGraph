@@ -1,0 +1,145 @@
+:root {
+  --left-panel: #272727;
+  --graph-bg: #D3D5D4;
+  --titles: #A2C5AC;
+  --fnt-col: #D3D5D4;
+}
+
+/*QuickReset*/ *{box-sizing:border-box;margin:0;} html,body{height:100%;}
+
+.flex-row{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column; /* or:   flex-flow: column wrap; */
+  height: 100%;
+}
+
+.flex-fill { /* Add this class to the element you want to expand */
+  flex: 1;
+}
+/******^ Flex the main layout of the page for responsiveness ^****/
+#choiceSegment{
+  background: inherit;
+  border: none;
+  box-shadow: none;
+  padding-left: 200px;
+  padding-right: 200px;
+}
+
+#mysql{
+  border: 1px solid transparent;
+  box-shadow: 0 0 0 #000;
+  transition: box-shadow 0.2s linear;
+  border-radius: 10px;
+  margin-right: 5px;
+}
+
+#mysql:hover{
+  border-radius: 10px;
+  box-shadow: -1px -1px 12px #bf9b30;
+}
+
+#psql{
+  border: 1px solid transparent;
+  box-shadow: 0 0 0 #000;
+  transition: box-shadow 0.2s linear;
+  border-radius: 10px;
+  margin-left: 5px;
+}
+
+#psql:hover{
+  border-radius: 10px;
+  box-shadow: -1px -1px 12px #bf9b30;
+}
+
+#formLabel{
+  color: white;
+  width: 100px;
+}
+
+#formInput{
+  background: inherit;
+  color: var(--fnt-col);
+  border-bottom: 1px solid var(--fnt-col);
+}
+#formInput:focus{
+  border-color: var(--fnt-col);
+}
+
+#dbButton{
+  margin-top: 30px;
+  width: 150px;
+  margin-right: 0px;
+}
+
+/*************^ styling for the modal login db ^*********/
+
+#accordionTitles{
+  color: var(--titles);
+}
+
+#visualizationButtons{
+  padding-left: 10px;
+}
+
+#initialStateButton, #allStatesButton, #frontierButton {
+  background: inherit;
+  color: white;
+}
+
+#initialStateButton:hover, #allStatesButton:hover, #frontierButton:hover{
+  color: var(--titles);
+}
+
+#initialStateIcon, #allStatesIcon, #frontierIcon{
+  background: inherit;
+}
+/***********^ sytling for the node visualization buttons ^***/
+
+
+#menu{
+  width: 100px;
+  background: #000;
+  color: #fff;
+  position:absolute;
+  z-index: 9999;
+  display: none;
+  box-shadow: 0 0 10px #713C3C;
+}
+#menu ul{
+  list-style: none;
+  padding: 0;
+  margin:0;
+}
+#menu ul a{
+  text-decoration: none;
+}
+#menu ul li{
+  width: 88%;
+  padding: 6%;
+  background-color: #F04D44;
+  color: #fff;
+}
+#menu ul li:hover{
+  background-color: #F7BA4B;
+      color: #444343;
+}
+
+#queryDiv{
+  background:gray;
+  height: 60px;
+  position: fixed;
+  bottom: 0;
+  left: 20%;
+  width: 80%;
+}
+
+body{
+  overflow: hidden;
+}
