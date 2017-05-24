@@ -14,10 +14,23 @@
     <script src="semantic/dist/semantic.min.js"></script>
     <script src="javascript/layout.js"></script>
     <script src="javascript/vis.js"></script>
+    <script src="javascript/databaseCon.js"></script>
+    <script src="javascript/graphAPI.js"></script>
+    <script src="javascript/tsAPI.js"></script>
+
   </head>
   <body>
     <!-- initial modal to sign in the database -->
     <div class="ui basic modal" id="loginModal">
+
+      <div class="ui hidden negative message" id="negativeMessage">
+        <i class="close icon"></i>
+        <div class="header">
+          Couldn't connect to the database.
+        </div>
+        <p id="negativeMessageReason">Did you check your credentials?</p>
+      </div>
+
       <div class="ui icon header" style="padding-bottom: 0px;">
         <i class="database icon"></i>
         Database login
@@ -64,15 +77,15 @@
             <div class="active content">
 
               <div class="ui vertical labeled icon buttons" id="visualizationButtons">
-                <button class="ui button" id="initialStateButton" onclick="loadRoot();">
+                <button class="ui button" id="initialStateButton" onclick="loadInitialState();">
                   <i class="cube icon" id="initialStateIcon"></i>
                   Load initial state
                 </button>
-                <button class="ui button" id="allStatesButton" onclick="loadGraph();">
+                <button class="ui button" id="allStatesButton" onclick="loadFullGraph();">
                   <i class="cubes icon" id="allStatesIcon" ></i>
                   Load all states
                 </button>
-                <button class="ui button" id="frontierButton" onclick="frontier();">
+                <button class="ui button" id="frontierButton" onclick="loadFrontier();">
                   <i class="angle double right icon" id="frontierIcon"></i>
                   Load frontier
                 </button>
@@ -85,6 +98,8 @@
             </div>
             <div class="active content">
               <p id="totalStates" style="padding-left: 25px;"></p>
+              <div id="bindingInformation" style="padding-left: 25px;">
+              </div>
             </div>
           </div>
         </div>
@@ -99,9 +114,11 @@
         </div>
 
         <div class="ui bottom attached active tab segment flex-fill"  style="padding: 0;" data-tab="first">
+
           <div id="mynetwork" style="height: 100%;">
 
           </div>
+
           <div id="menu">
            <ul>
            <a href="#"><li id="firstMenuItem">Node: -</li></a>
@@ -129,9 +146,12 @@
                 <textarea name="name" rows="2" id="queryBox">SELECT * FROM </textarea>
               </div>
               <div class="field">
-                  <button type="button" name="button" class="ui button"
-                   id="queryButton" onclick="findNodes();" data-title="Using click events"
-                   data-content="Clicked popups will close if you click away, but not if you click inside the popup">Query</button>
+
+                  <button class="ui mini button" id="queryButton" onclick="queryDatabase();" data-title="Using click events"
+                   data-content="Clicked popups will close if you click away, but not if you click inside the popup" style="width:100%; border-bottom: 1px solid black;">Query</button>
+                   <button class="ui mini button" onclick="findNodes();" style="width:100%">Nodes</button>
+
+
 
               </div>
             </div>

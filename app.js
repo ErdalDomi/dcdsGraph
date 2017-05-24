@@ -1,22 +1,30 @@
 var express = require('express')
 var app = express()
 var path = require('path')
-var Client = require('pg').Client;
-var mysql = require('mysql');
+var bodyParser = require('body-parser');
+
 var psql = require('pg');
-var connection = require('pg').Connection;
-var bodyParser = require('body-parser')
+var Client = require('pg').Client;
+var psqlConnection = require('pg').Connection;
+
+var mysql = require('mysql');
+var mysqlConnection;
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({extended:true}));  // to support URL-encoded bodies
 
-
-
 var client; //we use this to query the database
-
+var sessionDBtype;
 //this is to serve static files like html and css from
 //the public folder
 app.use(express.static(path.join(__dirname, 'public')))
+
+//Start the app
+var port = 8000;
+var onServerStart = function() {
+  console.log("Listening on: localhost:" + port);
+}
+app.listen(port,onServerStart);
 
 /*This will get the information from the ajax request and
 create a connection to the db. Then we use the variable
@@ -26,38 +34,104 @@ app.post("/dbconnect", function(request, response){
   var username = 'postgres'; //request.body.username;
   var password = 'password'; //request.body.password;
   var dbname = 'dcds'; //request.body.dbname;
-  var connectionStatus = "yes"; //to keep track of the connection status
-  client = new Client({
-      user: username,
-      password: password,
-      database: dbname,
-      host: '127.0.0.1',
-      port: 5432
+  var dbtype = request.body.dbtype;
+  sessionDBtype = request.body.dbtype;
+
+  if(dbtype == "psql"){
+    client = new Client({
+        user: username,
+        password: password,
+        database: dbname,
+        host: '127.0.0.1',
+        port: 5432
+      });
+
+    psqlConnection = client.connect(function(err){
+      if(err){
+        console.log("There was a credential problem connecting to the database. \n ", err);
+        response.send("no");
+      }else{
+        response.send("yes");
+        console.log('Successfully connected to '+ dbname + ' as user ' + username);
+      }
     });
-  connection = client.connect(function(err){
-    if(err){
-      console.log("error connecting ", err);
-      connectionStatus = "no"; //still an issue when we dont get a proper connection
-    }
-  });
-  console.log('Connected to '+dbname + ' as user ' +username);
-  response.send(connectionStatus);
+
+  }else if(dbtype == "mysql"){
+    mysqlConnection = mysql.createConnection({
+      host  :   'localhost',
+      user  :   'root',
+      password  : 'password',
+      database  : 'dcds'
+    });
+    mysqlConnection.connect(function(err){
+      if(err){
+        console.log("There was a credential problem connecting to the database. \n", err);
+        response.send("no");
+      }else{
+        console.log("Successfully connected to mysql dcds database as root");
+        response.send("yes");
+      }
+    });
+
+  } //end else dbtype mysql
+
+
 });
 
-//Start the app
-var port = 8000;
-var onServerStart = function() {
-  console.log("Listening on port " + port);
-}
-app.listen(port,onServerStart);
+app.get("/loadInitialState", function(req,res){
+  if(sessionDBtype == 'psql'){
+    var query = client.query('select * from "TS" where curr = 1');
+    query.on('end', function(result){
+      res.send(result.rows[0]);
+    });
+  }else if (sessionDBtype == 'mysql'){
+    //mysql code here
+  }
+});
 
-app.post("/queryNodes", function(req, res){
+app.post("/loadFrontier", function(req,res){
+  if(sessionDBtype == 'psql'){
+    var query = client.query('select * from "TS" where curr ='+req.body.currentNodeID);
+    query.on('error', function(error){
+      console.log("Can't expand anymore. " + error+". Node trying to expand: "+req.body.currentNodeID);
+      res.send({id: 1, label:'1'}); //this because the graph wont allow a repeated node and root is always there
+    });
+    query.on('end', function(result){
+      res.send(result.rows);
+    });
+  }else if (sessionDBtype == 'mysql'){
+    //mysql code here
+  }
+});
+
+app.get("/loadFullGraph", function(request, response){
+
+  if(sessionDBtype == 'psql'){
+    var query = client.query('select * from "TS"');
+    query.on('error', function(error){
+      console.log("captain there was a problem with the query. " + error);
+    });
+    query.on('end', function(result){
+      response.send(result.rows);
+    });
+  }else if (sessionDBtype == 'mysql'){
+    var query = mysqlConnection.query('select * from graphStub', function(error, results, fields){
+      if(error) throw error;
+      response.send(results);
+    });
+  }
+});
+
+app.post("/queryDatabase", function(req, res){
   var columnNames = new Array();
-  console.log("got " + req.body.query);
   var query = client.query(req.body.query, function(err, result){
-    var firstRow = result.rows[0];
-    for(var columnName in firstRow) {
-      columnNames.push(columnName);
+    if(err){
+      console.log("There was an error with the query. " + err);
+    } else {
+      var firstRow = result.rows[0];
+      for(var columnName in firstRow) {
+        columnNames.push(columnName);
+      }
     }
   });
   var responseArray = [];
@@ -72,13 +146,13 @@ app.post("/queryNodes", function(req, res){
   });
 
   query.on('end', function(result){
-    console.log('sending back ' + responseArray + ' to client');
     res.send(responseArray);
   });
+
+
 });
 
 app.post("/queryTotalStates", function(req, res){
-  console.log("The total states query made it on the backend: "+ req.body.query);
   var query = client.query(req.body.query);
   var idArray = [];
   query.on('row', function(row, result){
@@ -90,79 +164,70 @@ app.post("/queryTotalStates", function(req, res){
   });
 });
 
-app.post("/loadNextNodes", function(req,res){
+app.post("/getEdgeLabel", function(req,res){
+  if(sessionDBtype == 'psql'){
+    var query = client.query('select * from "TS" where curr = '+req.body.from+' and next = '+req.body.to+';');
+    query.on('end', function(result){
+      res.send(result.rows[0]);
+    });
 
-  var query = client.query('select next from "TS" where curr = '+req.body.currentNodeID);
+    query.on('error', function(error){
+      console.log("There was an error getting edge label. " + error);
+    });
 
-  var responseArray = [];
-  query.on('row', function(row, result){
-    console.log("row next: " + row.next);
-    responseArray.push({id: row.next, label: row.next});
-  });
-  query.on('end', function(result){
-    res.send(responseArray);
-  });
+  }else if (sessionDBtype == 'mysql'){
+    //mysql code here
+  }
 });
 
-app.post("/loadNextEdges", function(req,res){
+app.post("/getBindingInfo", function(req,res){
+  if(sessionDBtype == 'psql'){
+    var query = client.query('select * from "TS" where curr = '+req.body.from+' and next = '+req.body.to+';');
 
-  var query = client.query('select * from "TS" where curr ='+req.body.currentNodeID);
+    query.on('end', function(result){
 
-  var responseArray = [];
-  query.on('row', function(row, result){
+      var action = result.rows[0].action;
+      var binding = result.rows[0].binding;
 
-    var currLabel = '('+row.action+','+row.binding+')';
-    curr = {from: row.curr, to: row.next, arrows: 'to', label: currLabel };
-    responseArray.push(curr);
-  });
-  query.on('end', function(result){
-    res.send(responseArray);
-  });
+      var query2 = client.query('select * from ' +action + '_params where param_id = '+ binding+';');
+
+      query2.on('end', function(result){
+        res.send(result.rows[0]);
+      });
+
+      query2.on('error', function(error){
+        console.log("There was an error getting binding information. " + error);
+      });
+    });
+
+    query.on('error', function(error){
+      console.log("There was an error getting edge label. " + error);
+    });
+
+
+
+  }else if (sessionDBtype == 'mysql'){
+    //mysql code here
+  }
 });
 
-app.get("/loadRoot", function(req,res){
-  var query = client.query('select * from "TS" where curr = 1');
-  var rootNode;
-  query.on('row', function(row, result){
-    rootNode = {curr: row.curr, label: ""+row.action+" "+row.binding};
-  });
-  query.on('end', function(result){
-    res.send(rootNode);
-  });
-});
+app.post("/findNodes", function(req,res){
+  if(sessionDBtype == 'psql'){
+    var query = client.query(req.body.query);
+    var idArray = [];
 
+    query.on('row', function(row,result){
+      idArray.push(row.curr);
+    });
 
-//This will load nodes from the connection table
-//and put them into the resopnse array as an object
-app.get("/loadNodes", function(request, response){
+    query.on('end', function(result){
+      res.send(idArray);
+    });
 
-  var query = client.query('select distinct curr from "TS"');
-  var responseArray = [];
-  query.on('row', function(row, result) {
-    curr = {id: row.curr, label: row.curr};
-    responseArray.push(curr);
-  });
-  query.on('end', function(result){
-    console.time('server loadNodes');
-    response.send(responseArray);
-    console.log("load nodes response array: " + responseArray);
-    console.timeEnd('server loadNodes');
-  });
-});
-
-app.get("/loadEdges", function(request, response){
-
-  var query = client.query('select * from "TS"');
-  var responseArray = [];
-  query.on('row', function(row, result){
-    var currLabel = '('+row.action+','+row.binding+')';
-    curr = {from: row.curr, to: row.next, arrows: 'to', label: currLabel };
-    responseArray.push(curr);
-  });
-  query.on('end', function(result){
-    console.time('server loadEdges');
-    console.log("load edges response array: " + responseArray);
-    response.send(responseArray);
-    console.timeEnd('server loadEdges');
-  });
+    query.on('error', function(error){
+      console.log("there was an error with query nodes. " + error);
+    });
+  }else if (sessionDBtype == 'mysql'){
+    //mysql code here
+  }
 });
