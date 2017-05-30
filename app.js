@@ -30,10 +30,9 @@ app.listen(port,onServerStart);
 create a connection to the db. Then we use the variable
 client to query the database.*/
 app.post("/dbconnect", function(request, response){
-  console.log("got a dbconnect psot request");
-  var username = 'postgres'; //request.body.username;
-  var password = 'password'; //request.body.password;
-  var dbname = 'dcds128'; //request.body.dbname;
+  var username =  request.body.username;//'postgres';
+  var password = request.body.password; //'password';
+  var dbname =  request.body.dbname;//'dcds128';
   var dbtype = request.body.dbtype;
   sessionDBtype = request.body.dbtype;
 
@@ -48,7 +47,7 @@ app.post("/dbconnect", function(request, response){
 
     psqlConnection = client.connect(function(err){
       if(err){
-        console.log("There was a credential problem connecting to the database. \n ", err);
+        console.log("There was a credential problem connecting to the database. Note that we're using host 127.0.0.1 and port 5432 to connect. \n ", err);
         response.send("no");
       }else{
         response.send("yes");
@@ -81,6 +80,9 @@ app.post("/dbconnect", function(request, response){
 app.get("/loadInitialState", function(req,res){
   if(sessionDBtype == 'psql'){
     var query = client.query('select * from "TS" where curr = 1');
+    query.on('error', function(error){
+      console.log("Problem loading initial state");
+    });
     query.on('end', function(result){
       res.send(result.rows[0]);
     });
@@ -109,7 +111,7 @@ app.get("/loadFullGraph", function(request, response){
   if(sessionDBtype == 'psql'){
     var query = client.query('select * from "TS"');
     query.on('error', function(error){
-      console.log("captain there was a problem with the query. " + error);
+      console.log("problem loading full graph " + error);
     });
     query.on('end', function(result){
       response.send(result.rows);
@@ -167,13 +169,16 @@ app.post("/queryTotalStates", function(req, res){
 app.post("/getEdgeLabel", function(req,res){
   if(sessionDBtype == 'psql'){
     var query = client.query('select * from "TS" where curr = '+req.body.from+' and next = '+req.body.to+';');
+
+    query.on('error', function(error){
+      console.log("There was an error getting edge label. Restart app" + error);
+    });
+
     query.on('end', function(result){
       res.send(result.rows[0]);
     });
 
-    query.on('error', function(error){
-      console.log("There was an error getting edge label. " + error);
-    });
+
 
   }else if (sessionDBtype == 'mysql'){
     //mysql code here
