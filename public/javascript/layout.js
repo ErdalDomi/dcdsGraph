@@ -4,6 +4,20 @@ $( document ).ready(function() {
   $('.tabular.menu .item').tab();
   console.log("Tabs activated.");
 
+  $('.tabular.menu .thirdTab').tab({
+    onLoad: function(){
+      $('#queryButton').text('Query');
+      $('#queryButton').attr('onclick', 'queryDatabase();');
+    }
+  });
+
+  $('.tabular.menu .firstTab').tab({
+    onLoad: function(){
+      $('#queryButton').text('Select nodes');
+      $('#queryButton').attr('onclick', 'findNodes();');
+    }
+  });
+
   $('.ui.basic.modal').modal('show');
   console.log("Modal activated.");
 

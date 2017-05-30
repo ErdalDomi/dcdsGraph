@@ -88,16 +88,16 @@
   padding-left: 10px;
 }
 
-#initialStateButton, #allStatesButton, #frontierButton {
+#initialStateButton, #allStatesButton, #frontierButton, #clusterButton, #pdfButton {
   background: inherit;
   color: white;
 }
 
-#initialStateButton:hover, #allStatesButton:hover, #frontierButton:hover{
+#initialStateButton:hover, #allStatesButton:hover, #frontierButton:hover, #clusterButton:hover, #pdfbutton:hover{
   color: var(--titles);
 }
 
-#initialStateIcon, #allStatesIcon, #frontierIcon{
+#initialStateIcon, #allStatesIcon, #frontierIcon, #clusterIcon, #pdfIcon{
   background: inherit;
 }
 /***********^ sytling for the node visualization buttons ^***/

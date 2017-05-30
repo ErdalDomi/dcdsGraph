@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DCDS</title>
+  <link rel="stylesheet" href="css/styling.css">
+  <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css">
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="semantic/dist/semantic.min.js"></script>
+
+
+</head>
+<body>
+  <div id="wrapper">
+
+    <div class="ui basic modal" id="loginModal">
+      <div class="ui icon header" style="padding-right: 9%;">
+        <i class="database icon"></i>
+        Database login
+      </div>
+      <div class="content">
+        <form class="ui form" id="databaseForm" onsubmit="event.preventDefault(); connectDB();">
+          <div class="ui fluid input field">
+            <label id="silkLabel">Database user:&nbsp;&nbsp;&nbsp; </label>
+            <input id="silkInput" type="text" name="username" autocomplete="off">
+          </div>
+          <div class="ui fluid input field">
+            <label id="silkLabel">Password:&nbsp;&nbsp;&nbsp;&nbsp; </label>
+            <input id="silkInput" type="password" name="password">
+          </div>
+          <div class="ui fluid input field">
+            <label id="silkLabel">Database name:&nbsp;&nbsp;&nbsp;&nbsp; </label>
+            <input id="silkInput" type="text" name="dbname"  autocomplete="off">
+          </div>
+          <button id="dbButton" class="ui inverted basic green button" onclick="">Connect</button>
+        </form>
+      </div>
+    </div>
+
+
+    <div id="leftPanel" style="background: #272727;"> <!-- var(left-panel); -->
+      <div class="ui inverted segment" style="background: #272727;">
+        <div class="ui inverted accordion">
+
+          <div class="title" id="goldTitles">
+            <i class="dropdown icon"></i>
+            NODE VISUALIZATION
+          </div>
+          <div class="active content">
+            <button class="ui button" id="rootNodeButton" onclick="loadRoot();"> Load root node </button>
+            <button class="ui button" id="allNodesButton" onclick="loadGraph();"> Load full graph </button>
+            <button class="ui button" id="evolveButton" onclick="nextStep();">Evolve</button>
+          </div>
+
+          <div class="title" id="goldTitles">
+            <i class="dropdown icon"></i>
+            TRANSITION SYSTEM
+          </div>
+          <div class="active content">
+            <h4 class="info" style="">Selected node: <p id="clickedNode">-</p></h4>
+            <h4 class="info">Total number of states: <p id="totalStates">-</p></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="ui bottom attached segment" id="rightPanel">
+
+      <div id="mynetwork"></div>
+
+      <div class="ui icon bottom left dropdown">
+        <i class="toggle up icon"></i>
+        <div class="menu" style="min-width: none;">  <!-- style="width: 20%;" -->
+          <div class="item" id="queryResult" style=""> <!-- style="height: 300px;" -->
+            <table id="queryTable">
+
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="queryDiv">
+        <textarea rows="2" placeholder="Enter query..." id="queryBox"></textarea>
+        <button class="ui button" id="findNodeButton" onclick="findNodes();">Run</button>
+      </div>
+      <script src="javascript/vis.js"></script>
+      <script src="javascript/main.js"></script>
+    </div>
+
+  </div>
+
+</body>
+</html>

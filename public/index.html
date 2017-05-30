@@ -1,95 +1,174 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>DCDS</title>
-  <link rel="stylesheet" href="css/styling.css">
-  <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css">
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script src="semantic/dist/semantic.min.js"></script>
+  <head>
+    <meta charset="utf-8">
+    <title>layout test</title>
 
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.css">
 
-</head>
-<body>
-  <div id="wrapper">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
+    <script src="semantic/dist/semantic.min.js"></script>
+    <script src="javascript/layout.js"></script>
+    <script src="javascript/vis.js"></script>
+    <script src="javascript/databaseCon.js"></script>
+    <script src="javascript/graphAPI.js"></script>
+    <script src="javascript/tsAPI.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.debug.js"></script>
+  </head>
+  <body>
+    <!-- initial modal to sign in the database -->
     <div class="ui basic modal" id="loginModal">
-      <div class="ui icon header" style="padding-right: 9%;">
+
+      <div class="ui hidden negative message" id="negativeMessage">
+        <i class="close icon"></i>
+        <div class="header">
+          Couldn't connect to the database.
+        </div>
+        <p id="negativeMessageReason">Did you check your credentials?</p>
+      </div>
+
+      <div class="ui icon header" style="padding-bottom: 0px;">
         <i class="database icon"></i>
         Database login
-      </div>
-      <div class="content">
-        <form class="ui form" id="databaseForm" onsubmit="event.preventDefault(); connectDB();">
-          <div class="ui fluid input field">
-            <label id="silkLabel">Database user:&nbsp;&nbsp;&nbsp; </label>
-            <input id="silkInput" type="text" name="username" autocomplete="off">
+        <div class="ui horizontal segments" id="choiceSegment">
+          <div class="ui left floated compact segment" id="mysql">
+            <img src="images/mysql.png" height="100px" width="100px">
           </div>
-          <div class="ui fluid input field">
-            <label id="silkLabel">Password:&nbsp;&nbsp;&nbsp;&nbsp; </label>
-            <input id="silkInput" type="password" name="password">
-          </div>
-          <div class="ui fluid input field">
-            <label id="silkLabel">Database name:&nbsp;&nbsp;&nbsp;&nbsp; </label>
-            <input id="silkInput" type="text" name="dbname"  autocomplete="off">
-          </div>
-          <button id="dbButton" class="ui inverted basic green button" onclick="">Connect</button>
-        </form>
-      </div>
-    </div>
-
-
-    <div id="leftPanel" style="background: #272727;"> <!-- var(left-panel); -->
-      <div class="ui inverted segment" style="background: #272727;">
-        <div class="ui inverted accordion">
-
-          <div class="title" id="goldTitles">
-            <i class="dropdown icon"></i>
-            NODE VISUALIZATION
-          </div>
-          <div class="active content">
-            <button class="ui button" id="rootNodeButton" onclick="loadRoot();"> Load root node </button>
-            <button class="ui button" id="allNodesButton" onclick="loadGraph();"> Load full graph </button>
-            <button class="ui button" id="evolveButton" onclick="nextStep();">Evolve</button>
-          </div>
-
-          <div class="title" id="goldTitles">
-            <i class="dropdown icon"></i>
-            TRANSITION SYSTEM
-          </div>
-          <div class="active content">
-            <h4 class="info" style="">Selected node: <p id="clickedNode">-</p></h4>
-            <h4 class="info">Total number of states: <p id="totalStates">-</p></h4>
+          <div class="ui right floated compact segment" id="psql">
+            <img src="images/psql.png" height="100px" width="100px">
           </div>
         </div>
       </div>
+      <div class="content" style="text-align:center; padding-top: 0px;">
+
+          <form class="ui form" id="databaseForm" onsubmit="event.preventDefault(); connectDB();">
+            <div class="ui inline field">
+              <label id="formLabel" style="padding-right: 7px;">Database user:</label>
+              <input id="formInput" type="text" name="username" autocomplete="off">
+            </div>
+            <div class="ui inline field">
+              <label id="formLabel" style="padding-right: 33px;">Password:</label>
+              <input id="formInput" type="password" name="password">
+            </div>
+            <div class="ui inline field">
+              <label id="formLabel">Database name:</label>
+              <input id="formInput" type="text" name="dbname"  autocomplete="off">
+            </div>
+            <button id="dbButton" class="ui inverted basic green button" onclick="">Connect</button>
+          </form>
+
+      </div>
     </div>
 
+    <div class="flex-row">
 
+      <div class="leftPanel" style="width: 20%; background:#272727;">
+        <div class="ui inverted segment" style="background: #272727;">
+          <div class="ui inverted accordion">
 
+            <div class="title" id="accordionTitles">
+              <i class="dropdown icon"></i>
+              NODE VISUALIZATION
+            </div>
+            <div class="active content">
 
-    <div class="ui bottom attached segment" id="rightPanel">
+              <div class="ui vertical labeled icon buttons" id="visualizationButtons">
+                <button class="ui button" id="initialStateButton" onclick="loadInitialState();">
+                  <i class="cube icon" id="initialStateIcon"></i>
+                  Load initial state
+                </button>
+                <button class="ui button" id="allStatesButton" onclick="loadFullGraph();">
+                  <i class="cubes icon" id="allStatesIcon" ></i>
+                  Load all states
+                </button>
+                <button class="ui button" id="frontierButton" onclick="loadFrontier();">
+                  <i class="angle double right icon" id="frontierIcon"></i>
+                  Load frontier
+                </button>
+                <button class="ui button" id="clusterButton" onclick="clusterByAction();">
+                  <i class="circle thin icon" id="clusterIcon"></i>
+                  Cluster by action
+                </button>
+                <button class="ui button" id="pdfButton" onclick="generatePDF();">
+                  <i class="file pdf outline icon" id="pdfIcon"></i>
+                  Export to pdf
+                </button>
+              </div>
+            </div>
 
-      <div id="mynetwork"></div>
+            <div class="title" id="accordionTitles">
+              <i class="dropdown icon"></i>
+              TRANSITION SYSTEM
+            </div>
+            <div class="active content">
 
-      <div class="ui icon bottom left dropdown">
-        <i class="toggle up icon"></i>
-        <div class="menu" style="min-width: none;">  <!-- style="width: 20%;" -->
-          <div class="item" id="queryResult" style=""> <!-- style="height: 300px;" -->
-            <table id="queryTable">
-
-            </table>
+              <h4 style="padding-left: 25px;">General information</h4>
+              <p id="totalStates" style="padding-left: 25px;">--</p>
+              <div class="ui divider" style="margin-left: 25px;"></div>
+              <h4 style="padding-left:25px;">Binding information</h4>
+              <div id="bindingInformation" style="padding-left: 25px;">
+                <p>--</p>
+              </div>
+              <div class="ui divider" style="margin-left: 25px;"></div>
+            </div>
           </div>
         </div>
       </div>
-      <div id="queryDiv">
-        <textarea rows="2" placeholder="Enter query..." id="queryBox"></textarea>
-        <button class="ui button" id="findNodeButton" onclick="findNodes();">Run</button>
-      </div>
-      <script src="javascript/vis.js"></script>
-      <script src="javascript/main.js"></script>
-    </div>
 
-  </div>
+      <div class="flex-col flex-fill">
 
-</body>
+        <div class="ui top attached tabular menu">
+          <a class="active firstTab item" data-tab="first">Graph</a>
+          <a class="item secondTab" data-tab="second">Node information</a>
+          <a class="item thirdTab" data-tab="third">Query results</a>
+        </div>
+
+        <div class="ui bottom attached active tab segment flex-fill"  style="padding: 0;" data-tab="first">
+
+          <div id="mynetwork" style="height: 1400px;">
+
+          </div>
+
+          <div id="menu">
+           <ul>
+           <a href="#"><li id="firstMenuItem">Node: -</li></a>
+           <a href="#"><li id="secondMenuItem">Copy</li></a>
+           <a href="#"><li id="thirdMenuItem">Edit</li></a>
+           <a href="#"><li id="fourthMenuItem">Inspect</li></a>
+           </ul>
+          </div>
+        </div>
+
+
+        <div class="ui bottom attached tab segment flex-fill" data-tab="second">
+          <p id="clickedNode"></p>
+        </div>
+
+        <div class="ui bottom attached tab segment flex-fill" data-tab="third">
+          <table id="queryTable">
+          </table>
+        </div>
+
+        <div id="queryDiv">
+          <div class="ui form">
+            <div class="inline fields" style="margin-bottom: 0px;">
+              <div class="field" style="width:95%;">
+                <textarea name="name" rows="2" id="queryBox">SELECT * FROM "TS" where curr = 3;</textarea>
+              </div>
+              <div class="field">
+                  <button class="ui button" id="queryButton" onclick="findNodes();">Select nodes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- flex col -->
+
+    </div> <!-- flex row -->
+
+  </body>
 </html>

@@ -4,11 +4,66 @@ var currentNodeIDs=[]; //the list of frontier nodes waiting to be expanded
 var existingNodeIDs = []; //to check if node already exists before inserting
 var fullGraphLoaded = false;
 var network = "";
+
 $( document ).ready(function() {
+  //initialization
   startGraph();
   setNetworkMenu();
   setNetworkEdge();
 });
+
+var options = {
+  "edges": {
+    "smooth": false
+  },
+  layout: {
+    improvedLayout: true,
+    hierarchical: {
+      enabled: false,
+      parentCentralization: false,
+      blockShifting: false,
+      edgeMinimization: false,
+      sortMethod: 'hubsize',
+      direction: 'LR'
+    }
+  },
+  nodes: {
+    size: 35,
+    color: {
+      border: '#000',
+      background: '#fff',
+      highlight: {
+        border: '#000',
+        background: '#fff'
+      },
+      hover: {
+        border: '#6BA368',
+        background: '#D2E5FF'
+      }
+    },
+    font: {
+      color: '#000',
+      size: 14, //px
+      strokeColor: '#fff',
+      align: 'center'
+    },
+    shape: 'circle'
+  },
+  "physics": {
+    "forceAtlas2Based": {
+      "gravitationalConstant": -394,
+      "springLength": 100,
+      "springConstant": 0.165,
+      "damping": 0.22,
+      "avoidOverlap": 0.77
+    },
+    "maxVelocity": 150,
+    "minVelocity": 5.39,
+    "solver": "forceAtlas2Based"
+  }
+};
+
+
 
 function startGraph(){
   nodes = new vis.DataSet();
@@ -17,57 +72,17 @@ function startGraph(){
     nodes: nodes,
     edges: edges
   };
-  var options = {
-    layout: {
-      improvedLayout: true,
-      hierarchical: {
-        enabled: false,
-        parentCentralization: false,
-        blockShifting: false,
-        edgeMinimization: false,
-        sortMethod: 'hubsize',
-        direction: 'LR'
-      }
-    },
-    nodes: {
-      size: 35,
-      color: {
-        border: '#798071',
-        background: '#353D2F',
-        highlight: {
-          border: '#6BA368',
-          background: '#519872'
-        },
-        hover: {
-          border: '#6BA368',
-          background: '#D2E5FF'
-        }
-      },
-      font: {
-        color: '#D3D5D4',
-        size: 14, //px
-        strokeColor: '#fff',
-        align: 'center'
-      },
-      shape: 'circle'
-    },
-    physics: {
-      barnesHut: {
-        gravitationalConstant: -5500,
-        centralGravity: 0.75,
-        springLength: 0,
-        damping: 0.2,
-        avoidOverlap: 1
-      },
-      minVelocity: 0.75
-    }
-  };
+
   var container = document.getElementById('mynetwork');
   network = new vis.Network(container, data, options);
 }
 
 function setNetworkEdge(){
+
+  //this first bit is to update the label on the selected edge
+  var currentEdgeID = "";
   network.on('selectEdge', function(params){
+    currentEdgeID = params.edges[0];
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function(){
       if(this.readyState == 4 && this.status == 200){
@@ -80,19 +95,16 @@ function setNetworkEdge(){
     xhttp.send('from='+edges.get(params.edges[0]).from+'&to='+edges.get(params.edges[0]).to);
   });
 
+  //this second bit is to show it on the panel
   network.on('selectEdge',function(params){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function(){
       if(this.readyState == 4 && this.status == 200){
         bindingInfo = JSON.parse(this.responseText);
-        console.log("binding info back: " + bindingInfo);
-        // edges.update({id: params.edges[0], label: '('+edgeLabel.action+','+edgeLabel.binding+')'});
-        //jquery here
         var html = "";
         for(var field in bindingInfo){
           html = html + '<p>'+field+': '+bindingInfo[field]+'</p>'
         }
-        //
         $('#bindingInformation').html(html);
       }
     }
@@ -100,8 +112,55 @@ function setNetworkEdge(){
     xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhttp.send('from='+edges.get(params.edges[0]).from+'&to='+edges.get(params.edges[0]).to);
   });
+
+  //this resets the labels edge and panel
+  network.on('deselectEdge', function(params){
+    edges.update({id: currentEdgeID, label: ''});
+    $('#bindingInformation').html('');
+  });
 }
 
+
+function clusterByAction() {
+    var actions = ['startw','rvwreq','fillrmb', 'endw', 'revwreimb'];
+    var clusterOptionsByAction;
+    for (var i = 0; i < actions.length; i++) {
+        var action = actions[i];
+        clusterOptionsByAction = {
+            joinCondition: function (childOptions) {
+                return childOptions.group == action;
+            },
+            processProperties: function (clusterOptions, childNodes, childEdges) {
+                  var totalMass = 0;
+                  for (var i = 0; i < childNodes.length; i++) {
+                      totalMass += childNodes[i].mass;
+                  }
+                  clusterOptions.mass = totalMass;
+                  clusterOptions.physics = false;
+                  return clusterOptions;
+              },
+            clusterNodeProperties: {id: action, label: action}
+        };
+        network.cluster(clusterOptionsByAction);
+    }
+    // network.setOptions(options = {
+    //   "edges": {
+    //     "smooth": true
+    //   },
+    //   "physics": {
+    //     stabilizations:true,
+    //     // "enabled": false,
+    //     "minVelocity": 1
+    //   }
+    // });
+    network.on("selectNode", function(params) {
+        if (params.nodes.length == 1) {
+            if (network.isCluster(params.nodes[0]) == true) {
+                network.openCluster(params.nodes[0]);
+            }
+        }
+    });
+}
 
 function setNetworkMenu(){
   network.on('click', function(params){
@@ -148,10 +207,16 @@ function setNetworkMenu(){
        theNode = network.getNodeAt(params.pointer.DOM);
        $('#firstMenuItem').text("Node: "+theNode);
        $('#clickedNode').text("Selected node: "+theNode);
+       $('#secondMenuItem').text("Copy");
+       $('#thirdMenuItem').text("Edit");
+       $('#fourthMenuItem').text("Inspect");
        network.selectNodes([theNode]);
      } catch (e) {
        console.log("No node here.");
-       $('#firstMenuItem').text("Node: --");
+       $('#firstMenuItem').text("Stub");
+       $('#secondMenuItem').text("Stub");
+       $('#thirdMenuItem').text("Stub");
+       $('#fourthMenuItem').text("Stub");
      } finally {
 
      }
@@ -171,7 +236,7 @@ function loadInitialState(){
         currentNodeIDs = [];
         existingNodeIDs = [];
       }
-      nodes.add({id:rootNode.curr, label:rootNode.curr});
+      nodes.add({id:rootNode.curr, label:rootNode.curr, group: rootNode.action});
       currentNodeIDs.push(rootNode.curr);
       existingNodeIDs.push(rootNode.curr);
     }
@@ -189,7 +254,8 @@ function loadFrontier(){
         var rows = JSON.parse(this.responseText);
         for(var i=0, len = rows.length; i<len; i++){
           if(existingNodeIDs.indexOf(rows[i].next) == -1){
-            nodes.add({id: rows[i].next, label: rows[i].next});
+            console.log("pushing action on node: " + rows[i].action);
+            nodes.add({id: rows[i].next, label: rows[i].next, group: rows[i].action});
             currentNodeIDs.push(rows[i].next);
             existingNodeIDs.push(rows[i].next);
           }
@@ -221,12 +287,12 @@ function loadFullGraph(){
       var rows = JSON.parse(this.responseText);
       for(var i=0, len = rows.length; i<len; i++){
         if(existingNodeIDs.indexOf(rows[i].curr) == -1){
-          nodes.add({id: rows[i].curr, label: rows[i].curr});
+          nodes.add({id: rows[i].curr, label: rows[i].curr, group: rows[i].action});
           existingNodeIDs.push(rows[i].curr);
           console.log(existingNodeIDs);
         }
         if(existingNodeIDs.indexOf(rows[i].next) == -1){
-          nodes.add({id: rows[i].next, label: rows[i].next});
+          nodes.add({id: rows[i].next, label: rows[i].next, group: rows[i].action});
           existingNodeIDs.push(rows[i].next);
           console.log(existingNodeIDs);
         }
@@ -238,4 +304,24 @@ function loadFullGraph(){
   xhttp.open("GET", "/loadFullGraph", true);
   xhttp.send();
   fullGraphLoaded=true;
+}
+
+function generatePDF(){
+
+  html2canvas($("canvas")[0], {
+      onrendered: function(canvas) {
+          var imgData = canvas.toDataURL(
+              'image/png');
+          var doc = new jsPDF('p', 'mm');
+          doc.addImage(imgData, 'PNG', 10, 10);
+          doc.save('sample-file.pdf');
+      }
+  });
+
+    //
+    // var doc = new jsPDF();
+    // var canvas = document.querySelector('canvas');
+    // var imgData = canvas.toDataURL("image/jpeg", 1.0);
+    // doc.addImage(imgData, 'JPEG', 0, 0);
+    // doc.save('TSgraph.pdf');
 }

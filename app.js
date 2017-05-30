@@ -33,7 +33,7 @@ app.post("/dbconnect", function(request, response){
   console.log("got a dbconnect psot request");
   var username = 'postgres'; //request.body.username;
   var password = 'password'; //request.body.password;
-  var dbname = 'dcds'; //request.body.dbname;
+  var dbname = 'dcds128'; //request.body.dbname;
   var dbtype = request.body.dbtype;
   sessionDBtype = request.body.dbtype;
 
