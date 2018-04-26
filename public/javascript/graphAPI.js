@@ -75,6 +75,31 @@ function startGraph() {
 
     var container = document.getElementById('mynetwork');
     network = new vis.Network(container, data, options);
+    network.on("selectNode", function(params) {
+        if (params.nodes.length == 1) {
+            for (var i = 0; i < network.getConnectedEdges(params.nodes[0]).length; i++) {
+                getEdgeLabel(network.getConnectedEdges(params.nodes[0])[i]);
+            }
+        } else {
+            console.log("selected many nodes...");
+        }
+    });
+
+}
+
+
+function getEdgeLabel(edgeId) {
+    console.log("inside getEdgeLabel for id" + edgeId);
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            edgeLabel = JSON.parse(this.responseText);
+            edges.update({ id: edgeId, label: '(' + edgeLabel.action + ',' + edgeLabel.binding + ')' });
+        }
+    }
+    xhttp.open("post", "/getEdgeLabel", true);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.send('from=' + edges.get(edgeId).from + '&to=' + edges.get(edgeId).to);
 }
 
 function setNetworkEdge() {
@@ -83,16 +108,8 @@ function setNetworkEdge() {
     var currentEdgeID = "";
     network.on('selectEdge', function(params) {
         currentEdgeID = params.edges[0];
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                edgeLabel = JSON.parse(this.responseText);
-                edges.update({ id: params.edges[0], label: '(' + edgeLabel.action + ',' + edgeLabel.binding + ')' });
-            }
-        }
-        xhttp.open("post", "/getEdgeLabel", true);
-        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhttp.send('from=' + edges.get(params.edges[0]).from + '&to=' + edges.get(params.edges[0]).to);
+        getEdgeLabel(params.edges[0]);
+
     });
 
     //this second bit is to show it on the panel
@@ -115,8 +132,14 @@ function setNetworkEdge() {
 
     //this resets the labels edge and panel
     network.on('deselectEdge', function(params) {
-        edges.update({ id: currentEdgeID, label: '' });
-        $('#bindingInformation').html('');
+        console.log("inside deselect for edges id array" + params.previousSelection.edges);
+        for (var i = 0; i < params.previousSelection.edges.length; i++) {
+            console.log("removing: " + params.previousSelection.edges[i]);
+            edges.update({ id: params.previousSelection.edges[i], label: '' });
+            $('#bindingInformation').html('');
+        }
+        // edges.update({ id: currentEdgeID, label: '' });
+        // $('#bindingInformation').html('');
     });
 }
 
@@ -155,6 +178,7 @@ function clusterByAction() {
     // });
     network.on("selectNode", function(params) {
         if (params.nodes.length == 1) {
+
             if (network.isCluster(params.nodes[0]) == true) {
                 network.openCluster(params.nodes[0]);
             }

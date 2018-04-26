@@ -44,6 +44,7 @@ function findNodes() {
                 }
             };
             network.focus(ids[0]);
+            network.selectEdges(network.getConnectedEdges(ids[0]));
             $('#clickedNode').text("" + ids);
         }
     }
