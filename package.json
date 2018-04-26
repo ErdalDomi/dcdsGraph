@@ -1,16 +1,18 @@
 {
-  "name": "dcds",
-  "version": "1.0.0",
-  "description": "DCDS internship graph utility ",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Erdal Domi",
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.15.2",
-    "nodemon": "^1.17.2",
-    "semantic-ui": "^2.2.10"
-  }
+    "name": "dcds",
+    "version": "1.0.0",
+    "description": "DCDS internship graph utility ",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Erdal Domi",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.15.2",
+        "mysql": "^2.15.0",
+        "nodemon": "^1.17.3",
+        "pg": "6.4.2",
+        "semantic-ui": "^2.2.10"
+    }
 }
