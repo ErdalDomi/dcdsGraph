@@ -5,6 +5,8 @@ var existingNodeIDs = []; //to check if node already exists before inserting
 var fullGraphLoaded = false;
 var network = "";
 
+var clustered = false;
+
 $(document).ready(function() {
     //initialization
     startGraph();
@@ -76,13 +78,18 @@ function startGraph() {
     var container = document.getElementById('mynetwork');
     network = new vis.Network(container, data, options);
     network.on("selectNode", function(params) {
-        if (params.nodes.length == 1) {
+
+        if (network.isCluster(params.nodes[0])) {
+            network.openCluster(params.nodes[0]);
+            console.log("we're clusterd. exploding cluster");
+            totalClusters--;
+            console.log("Total clusters now: " + totalClusters);
+        } else {
             for (var i = 0; i < network.getConnectedEdges(params.nodes[0]).length; i++) {
                 getEdgeLabel(network.getConnectedEdges(params.nodes[0])[i]);
             }
-        } else {
-            console.log("selected many nodes...");
         }
+
     });
 
 }
@@ -107,45 +114,61 @@ function setNetworkEdge() {
     //this first bit is to update the label on the selected edge
     var currentEdgeID = "";
     network.on('selectEdge', function(params) {
-        currentEdgeID = params.edges[0];
-        getEdgeLabel(params.edges[0]);
+        if (totalClusters > 0) {
+            console.log("clustered. no.");
+        } else {
+            currentEdgeID = params.edges[0];
+            getEdgeLabel(params.edges[0]);
+        }
+
 
     });
 
     //this second bit is to show it on the panel
     network.on('selectEdge', function(params) {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                bindingInfo = JSON.parse(this.responseText);
-                var html = "";
-                for (var field in bindingInfo) {
-                    html = html + '<p>' + field + ': ' + bindingInfo[field] + '</p>'
+        if (totalClusters > 0) {
+            console.log("clustered. come tomorrow.");
+        } else {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    bindingInfo = JSON.parse(this.responseText);
+                    var html = "";
+                    for (var field in bindingInfo) {
+                        html = html + '<p>' + field + ': ' + bindingInfo[field] + '</p>'
+                    }
+                    $('#bindingInformation').html(html);
                 }
-                $('#bindingInformation').html(html);
             }
+            xhttp.open("post", "/getBindingInfo", true);
+            xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhttp.send('from=' + edges.get(params.edges[0]).from + '&to=' + edges.get(params.edges[0]).to);
         }
-        xhttp.open("post", "/getBindingInfo", true);
-        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhttp.send('from=' + edges.get(params.edges[0]).from + '&to=' + edges.get(params.edges[0]).to);
     });
 
     //this resets the labels edge and panel
     network.on('deselectEdge', function(params) {
-        console.log("inside deselect for edges id array" + params.previousSelection.edges);
-        for (var i = 0; i < params.previousSelection.edges.length; i++) {
-            console.log("removing: " + params.previousSelection.edges[i]);
-            edges.update({ id: params.previousSelection.edges[i], label: '' });
-            $('#bindingInformation').html('');
+        if (totalClusters > 0) {
+            console.log("we're clustered. come back tomorrow.");
+        } else {
+            console.log("inside deselect for edges id array" + params.previousSelection.edges);
+            for (var i = 0; i < params.previousSelection.edges.length; i++) {
+                console.log("removing: " + params.previousSelection.edges[i]);
+                edges.update({ id: params.previousSelection.edges[i], label: '' });
+                $('#bindingInformation').html('');
+            }
         }
         // edges.update({ id: currentEdgeID, label: '' });
         // $('#bindingInformation').html('');
     });
+
 }
 
+var totalClusters = 0;
 
 function clusterByAction() {
     var actions = ['startw', 'rvwreq', 'fillrmb', 'endw', 'revwreimb']; //query db
+
     var clusterOptionsByAction;
     for (var i = 0; i < actions.length; i++) {
         var action = actions[i];
@@ -165,6 +188,9 @@ function clusterByAction() {
             clusterNodeProperties: { id: action, label: action }
         };
         network.cluster(clusterOptionsByAction);
+        clustered = true;
+        totalClusters = actions.length;
+        console.log("totalclusters now: " + totalClusters);
     }
     // network.setOptions(options = {
     //   "edges": {
@@ -176,14 +202,7 @@ function clusterByAction() {
     //     "minVelocity": 1
     //   }
     // });
-    network.on("selectNode", function(params) {
-        if (params.nodes.length == 1) {
 
-            if (network.isCluster(params.nodes[0]) == true) {
-                network.openCluster(params.nodes[0]);
-            }
-        }
-    });
 }
 
 function setNetworkMenu() {
